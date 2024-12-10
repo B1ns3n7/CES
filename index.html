@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Time-In/Time-Out System</title>
+</head>
+<body>
+    <h1>Time-In/Time-Out System</h1>
+    <form id="timeForm">
+        <label for="name">Name:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
+        
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" required><br><br>
+        
+        <button type="button" id="timeInBtn" onclick="submitData('time_in')">Time In</button>
+        <button type="button" id="timeOutBtn" onclick="submitData('time_out')">Time Out</button>
+    </form>
+    
+    <script>
+        function submitData(action) {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+
+            if (!name || !email) {
+                alert("Please fill in both name and email.");
+                return;
+            }
+
+            const data = {
+                name: name,
+                email: email,
+                action: action
+            };
+
+            fetch('https://script.google.com/macros/s/AKfycbybr5DVOqGFSiBp2p74a2x4fBzbrWo9BK8jzqbHtOBe-gHUDblPtrtztjyqzxKbGVrWSQ/exec', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => alert(result.message))
+            .catch(error => alert('Error: ' + error.message));
+        }
+    </script>
+</body>
+</html>
