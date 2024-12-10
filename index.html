@@ -1,20 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>CES 3 Time-In/Time-Out System</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login/Logout System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
+    }
+    input, button {
+      margin: 10px 0;
+      padding: 10px;
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    button {
+      cursor: pointer;
+    }
+    .login {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+    }
+    .logout {
+      background-color: #f44336;
+      color: white;
+      border: none;
+    }
+  </style>
 </head>
 <body>
-    <h1>CES 3 Time-In/Time-Out System</h1>
-    <form id="timeForm">
-        <label for="name">Name:</label><br>
-        <input type="text" id="name" name="name" required><br><br>
-        
-        <label for="email">Email:</label><br>
-        <input type="email" id="email" name="email" required><br><br>
-        
-        <button type="button" id="timeInBtn" onclick="submitData('time_in')">Time In</button>
-        <button type="button" id="timeOutBtn" onclick="submitData('time_out')">Time Out</button>
-    </form>
+  <div class="container">
+    <h2>Login/Logout System</h2>
+    <input type="text" id="name" placeholder="Enter your name">
+    <input type="email" id="email" placeholder="Enter your email">
+    <button class="login" onclick="handleAction('login')">Login</button>
+    <button class="logout" onclick="handleAction('logout')">Logout</button>
+  </div>
+
     
     <script>
         function submitData(action) {
