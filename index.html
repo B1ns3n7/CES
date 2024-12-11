@@ -73,7 +73,7 @@
         function submitData(action) {
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
-
+	
             if (!name || !email) {
                 alert("Please fill in both name and email.");
                 return;
@@ -84,17 +84,20 @@
                 email: email,
                 action: action
             };
-
-            fetch('https://script.google.com/macros/s/AKfycbybr5DVOqGFSiBp2p74a2x4fBzbrWo9BK8jzqbHtOBe-gHUDblPtrtztjyqzxKbGVrWSQ/exec', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-                mode: 'no-cors'
-            })
-            .then(response => response.json())
-            .then(result => alert(result.message))
-            .catch(error => alert('Error: ' + error.message));
-        }
+            fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', {
+    		method: 'POST',
+    		headers: { 'Content-Type': 'application/json' },
+    		body: JSON.stringify(data)
+	   })
+	  .then(response => response.json())
+	  .then(result => {
+           alert(result.message);
+	})
+	.catch(error => {
+    		console.error('Error:', error);
+    		alert('Error: ' + error.message);
+	});
+        
     </script>
 </body>
 </html>
