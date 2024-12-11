@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CES Login/Logout System</title>
+  <title>CES Time in/Time out System</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -88,8 +88,7 @@
             fetch('https://script.google.com/macros/s/AKfycbybr5DVOqGFSiBp2p74a2x4fBzbrWo9BK8jzqbHtOBe-gHUDblPtrtztjyqzxKbGVrWSQ/exec', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-                mode: 'no-cors'
+                body: JSON.stringify(data)
             })
             .then(response => response.json())
             .then(result => alert(result.message))
