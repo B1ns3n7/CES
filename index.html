@@ -68,36 +68,36 @@
     </form>
   </div>
 
-    
-    <script>
-        function submitData(action) {
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-	
-            if (!name || !email) {
-                alert("Please fill in both name and email.");
-                return;
-            }
+  <script>
+    function submitData(action) {
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+  
+      if (!name || !email) {
+        alert("Please fill in both name and email.");
+        return;
+      }
 
-            const data = {
-                name: name,
-                email: email,
-                action: action
-            };
-            fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', {
-    		method: 'POST',
-    		headers: { 'Content-Type': 'application/json' },
-    		body: JSON.stringify(data)
-	   })
-	  .then(response => response.json())
-	  .then(result => {
-           alert(result.message);
-	})
-	.catch(error => {
-    		console.error('Error:', error);
-    		alert('Error: ' + error.message);
-	});
-        
-    </script>
+      const data = {
+        name: name,
+        email: email,
+        action: action
+      };
+
+  fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(result => {
+        alert(result.message);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error: ' + error.message);
+      });
+    }
+  </script>
 </body>
 </html>
