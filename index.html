@@ -90,14 +90,18 @@
         body: JSON.stringify(data)
       })
       .then(response => response.json())
-      .then(result => {
+    .then(result => {
+      if (result.message) {
         alert(result.message);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error: ' + error.message);
-      });
-    }
+      } else {
+        alert('Unexpected response format.');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error: ' + error.message);
+    });
+}
   </script>
 </body>
 </html>
