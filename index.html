@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CES 2.1 Time in/Time out System</title>
+  <title>CES 2.2 Time in/Time out System</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -92,7 +92,6 @@
         if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-alert("testing lang.");
     const result = await response.json();
     alert(result.message);
   } catch (error) {
