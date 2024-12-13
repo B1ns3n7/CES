@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time Tracking System</title>
+    <title>CES Time Tracking System</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -43,7 +43,7 @@
             const name = nameInput.value;
             const email = emailInput.value;
             if (name && email) {
-                fetch('YOUR_GOOGLE_APPS_SCRIPT_URL/logTime', {
+                fetch('https://script.google.com/macros/s/AKfycby6HbeRfwth5eL5jX8Tp7vmJKkvgxBFDO-1xcQhb-2ZWVd9va2bAvo7RotZqfa9VuQF9w/exec', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
