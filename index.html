@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login and Logout with Google Sheets</title>
+    <title>ces Time In and Time Out</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,42 +51,47 @@
 </head>
 <body>
     <div class="container">
-        <h1>Login and Logout</h1>
+        <h1>Time In and Time Out</h1>
+        <input type="text" id="name" placeholder="Enter your name" />
+        <br>
         <input type="email" id="email" placeholder="Enter your email" />
         <br>
-        <button id="login">Login</button>
-        <button id="logout" class="logout">Logout</button>
+        <button id="timeIn">Time In</button>
+        <button id="timeOut" class="logout">Time Out</button>
     </div>
     <script>
         // Replace with your Google Script Web App URL
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6HbeRfwth5eL5jX8Tp7vmJKkvgxBFDO-1xcQhb-2ZWVd9va2bAvo7RotZqfa9VuQF9w/exec";
 
-        document.getElementById('login').addEventListener('click', () => {
+        document.getElementById('timeIn').addEventListener('click', () => {
+            const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
-            if (!email) {
-                alert('Please enter your email.');
+            if (!name || !email) {
+                alert('Please enter your name and email.');
                 return;
             }
-            sendDataToGoogleSheet(email, 'login');
+            sendDataToGoogleSheet(name, email, 'Time In');
         });
 
-        document.getElementById('logout').addEventListener('click', () => {
+        document.getElementById('timeOut').addEventListener('click', () => {
+            const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
-            if (!email) {
-                alert('Please enter your email.');
+            if (!name || !email) {
+                alert('Please enter your name and email.');
                 return;
             }
-            sendDataToGoogleSheet(email, 'logout');
+            sendDataToGoogleSheet(name, email, 'Time Out');
         });
 
-        function sendDataToGoogleSheet(email, action) {
+        function sendDataToGoogleSheet(name, email, action) {
             const data = {
+                name,
                 email,
                 action,
                 timestamp: new Date().toISOString()
             };
 
-            fetch(GOOGLE_SCRIPT_URL, {
+            fetch(1RPdf9wHr67Mq1kv6eRMaxE-d4cD6m3f5wJojg7NTw0HTU573Q74, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -96,7 +101,7 @@
             .then(response => response.json())
             .then(result => {
                 if (result.success) {
-                    alert(`${action.charAt(0).toUpperCase() + action.slice(1)} successful!`);
+                    alert(`${action} recorded successfully!`);
                 } else {
                     alert('An error occurred. Please try again.');
                 }
