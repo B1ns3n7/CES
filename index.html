@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Tracking System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        input {
+            margin: 10px;
+            padding: 10px;
+            width: 200px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Time Tracking System</h1>
+    <input type="text" id="name" placeholder="Enter your name" required>
+    <input type="email" id="email" placeholder="Enter your email" required>
+    <button id="timeInBtn">Time In</button>
+    <button id="timeOutBtn">Time Out</button>
+
+    <script>
+        const timeInBtn = document.getElementById('timeInBtn');
+        const timeOutBtn = document.getElementById('timeOutBtn');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+
+        timeInBtn.addEventListener('click', () => {
+            const name = nameInput.value;
+            const email = emailInput.value;
+            if (name && email) {
+                fetch('YOUR_GOOGLE_APPS_SCRIPT_URL/logTime', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action: 'Time In', name, email })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Time In recorded!');
+                })
+                .catch(error => console.error('Error:', error));
+            } else {
+                alert('Please enter your name and email.');
+            }
+        });
+
+        timeOutBtn.addEventListener('click', () => {
+            const name = nameInput.value;
+            const email = emailInput.value;
+            if (name && email) {
+                fetch('YOUR_GOOGLE_APPS_SCRIPT_URL/logTime', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action: 'Time Out', name, email })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Time Out recorded!');
+                })
+                .catch(error => console.error('Error:', error));
+            } else {
+                alert('Please enter your name and email.');
+            }
+        });
+    </script>
+</body>
+</html>
