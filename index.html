@@ -3,69 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CES Login System 4</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            flex-direction: column;
-        }
-        input, button {
-            margin: 10px;
-            padding: 10px;
-            font-size: 16px;
-        }
-    </style>
-</head>
-<body>
-    <h2>Login System</h2>
-    <input type="text" id="name" placeholder="Enter Full Name" required>
-    <input type="email" id="email" placeholder="Enter Email Address" required>
-    <button onclick="logIn()">Log In</button>
-    <button onclick="logOut()">Log Out</button>
-    
+    <title>CES Login Tracker</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyyvrHa4kY-MRv9GXC5-ibTLuoy2SBomrRRUvxR2ZKVYd2h_83-0FuG9l8MOwLgq_bX/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyyvrHa4kY-MRv9GXC5-ibTLuoy2SBomrRRUvxR2ZKVYd2h_83-0FuG9l8MOwLgq_bX/exec';  // ✅ Replace with your actual Apps Script URL
 
         function validateEmail(email) {
-            const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-            return re.test(email);
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return regex.test(email);
         }
 
         function logTime(action) {
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const timestamp = new Date().toLocaleString();
+            const name = document.getElementById("name").value.trim();
+            const email = document.getElementById("email").value.trim();
 
-    if (!name || !email) {
-        alert("Please enter your name and email.");
-        return;
-    }
+            if (!name || !email) {
+                alert("Please enter both name and email.");
+                return;
+            }
 
-    console.log("Sending request to:", scriptURL);  // Debugging
+            if (!validateEmail(email)) {
+                alert("Please enter a valid email address.");
+                return;
+            }
 
-    fetch(scriptURL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, action, timestamp })
-    })
-    .then(response => response.text())
-    .then(response => {
-        console.log("Server Response:", response);  // Debugging
-        alert("Response from Server: " + response);
-    })
-    .catch(error => {
-        console.error('Fetch error:', error);
-        alert("Fetch error: " + error.message);
-    });
-}
+            const timestamp = new Date().toISOString();
 
-
-        function logIn() { logTime('Log In'); }
-        function logOut() { logTime('Log Out'); }
+            fetch(scriptURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, email, action, timestamp })
+            })
+            .then(response => response.json()) // ✅ Parses JSON response
+            .then(response => {
+                console.log("Server Response:", response);
+                alert("Success: " + response.status);
+            })
+            .catch(error => {
+                console.error("Fetch error:", error);
+                alert("An error occurred: " + error.message);
+            });
+        }
     </script>
+</head>
+<body class="container mt-5">
+    <div class="card p-4 shadow-lg">
+        <h2 class="text-center">Login Tracker</h2>
+        <div class="mb-3">
+            <label for="name" class="form-label">Full Name</label>
+            <input type="text" id="name" class="form-control" placeholder="Enter full name">
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email Address</label>
+            <input type="email" id="email" class="form-control" placeholder="Enter email">
+        </div>
+        <div class="d-flex justify-content-between">
+            <button onclick="logTime('login')" class="btn btn-success">Log In</button>
+            <button onclick="logTime('logout')" class="btn btn-danger">Log Out</button>
+        </div>
+    </div>
 </body>
 </html>
