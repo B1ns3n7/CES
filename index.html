@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CES Login System 8</title>
+    <title>CES Login System 1</title>
     <style>
         * {
             box-sizing: border-box;
@@ -121,8 +121,10 @@
             color: #a94442;
         }
         
-        #hiddeniframe {
+        #hiddenFrame {
             display: none;
+            width: 0;
+            height: 0;
         }
         
         /* Responsive adjustments */
@@ -161,7 +163,7 @@
     </div>
     
     <!-- Hidden iframe for form submission -->
-    <iframe name="hiddenFrame" id="hiddeniframe"></iframe>
+    <iframe id="hiddenFrame" name="hiddenFrame"></iframe>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
@@ -313,13 +315,10 @@
                     // Create a form element
                     const form = document.createElement('form');
                     form.method = 'POST';
-                    // Replace this URL with your actual Google Form submission URL
                     form.action = 'https://docs.google.com/forms/d/e/1FAIpQLSe6C0v7Vwd8W1ck6wcKCph2EDxQap11UGzYpmdfJ58oAOSJiQ/formResponse';
-                    form.target = 'hiddenFrame';
+                    form.target = 'hiddenFrame';  // Submit to hidden iframe
                     
                     // Create hidden inputs for each field
-                    // These entry numbers should match your Google Form field IDs
-                    // Replace "entry.123456789" with your actual entry IDs
                     const nameInput = document.createElement('input');
                     nameInput.type = 'hidden';
                     nameInput.name = 'entry.1849035150';  // Replace with your form's name field entry ID
@@ -355,6 +354,36 @@
                     console.error('Error submitting to Google Form:', error);
                     return false;
                 }
+            }
+            
+            // Alternative method using fetch API if iframe method doesn't work
+            function submitToGoogleFormWithFetch(userData, action) {
+                // Create form data
+                const formData = new FormData();
+                formData.append('entry.1849035150', userData.fullName);
+                formData.append('entry.1359401918', userData.email);
+                formData.append('entry.1585204396', action === 'login' ? userData.loginTime : userData.logoutTime);
+                formData.append('entry.1204481541', action);
+                
+                // Convert form data to URL-encoded string
+                const urlEncodedData = new URLSearchParams(formData).toString();
+                
+                // Use fetch to submit the form
+                fetch('https://docs.google.com/forms/d/e/1FAIpQLSe6C0v7Vwd8W1ck6wcKCph2EDxQap11UGzYpmdfJ58oAOSJiQ/formResponse', {
+                    method: 'POST',
+                    mode: 'no-cors', // Important - this prevents CORS errors
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: urlEncodedData
+                })
+                .then(response => {
+                    console.log(`${action} data sent to Google Form successfully`);
+                })
+                .catch(error => {
+                    // Note: Due to no-cors mode, this catch may not fire even on errors
+                    console.error('Error submitting to Google Form:', error);
+                });
             }
         });
     </script>
