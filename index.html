@@ -3,66 +3,360 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CES Login Tracker 1</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyyvrHa4kY-MRv9GXC5-ibTLuoy2SBomrRRUvxR2ZKVYd2h_83-0FuG9l8MOwLgq_bX/exec';  // ✅ Replace with your actual Apps Script URL
-
-        function validateEmail(email) {
-            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return regex.test(email);
+    <title>CES Login System 8</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
-        function logTime(action) {
-            const name = document.getElementById("name").value.trim();
-            const email = document.getElementById("email").value.trim();
-
-            if (!name || !email) {
-                alert("Please enter both name and email.");
-                return;
-            }
-
-            if (!validateEmail(email)) {
-                alert("Please enter a valid email address.");
-                return;
-            }
-
-            const timestamp = new Date().toISOString();
-
-            fetch(scriptURL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ name, email, action, timestamp })
-            })
-            .then(response => response.json()) // ✅ Parses JSON response
-            .then(response => {
-                console.log("Server Response:", response);
-                alert("Success: " + response.status);
-            })
-            .catch(error => {
-                console.error("Fetch error:", error);
-                alert("An error occurred: " + error.message);
-            });
+        
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
         }
-    </script>
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+        
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            background-color: #4a90e2;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 12px 0;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #357abd;
+        }
+        
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        #logoutBtn {
+            background-color: #e74c3c;
+        }
+        
+        #logoutBtn:hover {
+            background-color: #c0392b;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+        }
+        
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        
+        .failed {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+        
+        #hiddeniframe {
+            display: none;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
-<body class="container mt-5">
-    <div class="card p-4 shadow-lg">
-        <h2 class="text-center">Login Tracker</h2>
-        <div class="mb-3">
-            <label for="name" class="form-label">Full Name</label>
-            <input type="text" id="name" class="form-control" placeholder="Enter full name">
+<body>
+    <div class="container">
+        <h1>User Login System</h1>
+        <div class="form-group">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" placeholder="Enter your full name">
+            <div id="nameError" class="error">Please enter your full name</div>
         </div>
-        <div class="mb-3">
-            <label for="email" class="form-label">Email Address</label>
-            <input type="email" id="email" class="form-control" placeholder="Enter email">
+        
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="Enter your email address">
+            <div id="emailError" class="error">Please enter a valid email address</div>
         </div>
-        <div class="d-flex justify-content-between">
-            <button onclick="logTime('login')" class="btn btn-success">Log In</button>
-            <button onclick="logTime('logout')" class="btn btn-danger">Log Out</button>
+        
+        <div class="button-group">
+            <button id="loginBtn">Login</button>
+            <button id="logoutBtn" disabled>Logout</button>
         </div>
+        
+        <div id="statusMessage" class="status"></div>
     </div>
+    
+    <!-- Hidden iframe for form submission -->
+    <iframe name="hiddenFrame" id="hiddeniframe"></iframe>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Email validation regex
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            // Form elements
+            const fullNameInput = $('#fullName');
+            const emailInput = $('#email');
+            const loginBtn = $('#loginBtn');
+            const logoutBtn = $('#logoutBtn');
+            const nameError = $('#nameError');
+            const emailError = $('#emailError');
+            const statusMessage = $('#statusMessage');
+            
+            // Current user state
+            let isLoggedIn = false;
+            
+            // Check if user is logged in from localStorage
+            function checkLoginState() {
+                const userData = localStorage.getItem('userData');
+                if (userData) {
+                    const user = JSON.parse(userData);
+                    fullNameInput.val(user.fullName);
+                    emailInput.val(user.email);
+                    
+                    // Disable inputs and update button states
+                    fullNameInput.prop('disabled', true);
+                    emailInput.prop('disabled', true);
+                    loginBtn.prop('disabled', true);
+                    logoutBtn.prop('disabled', false);
+                    
+                    isLoggedIn = true;
+                    
+                    // Show login status
+                    statusMessage.text('You are logged in as ' + user.fullName);
+                    statusMessage.removeClass('failed').addClass('success').show();
+                }
+            }
+            
+            // Run on page load
+            checkLoginState();
+            
+            // Validate inputs
+            function validateInputs() {
+                let isValid = true;
+                
+                // Validate name
+                if (fullNameInput.val().trim() === '') {
+                    nameError.show();
+                    isValid = false;
+                } else {
+                    nameError.hide();
+                }
+                
+                // Validate email
+                if (!emailRegex.test(emailInput.val())) {
+                    emailError.show();
+                    isValid = false;
+                } else {
+                    emailError.hide();
+                }
+                
+                return isValid;
+            }
+            
+            // Real-time validation
+            fullNameInput.on('input', function() {
+                if (fullNameInput.val().trim() !== '') {
+                    nameError.hide();
+                }
+            });
+            
+            emailInput.on('input', function() {
+                if (emailRegex.test(emailInput.val())) {
+                    emailError.hide();
+                }
+            });
+            
+            // Handle login
+            loginBtn.on('click', function() {
+                if (!validateInputs()) {
+                    return;
+                }
+                
+                const loginTime = new Date().toISOString();
+                const userData = {
+                    fullName: fullNameInput.val().trim(),
+                    email: emailInput.val().trim(),
+                    loginTime: loginTime,
+                    logoutTime: null
+                };
+                
+                // Save to localStorage
+                localStorage.setItem('userData', JSON.stringify(userData));
+                
+                // Submit to Google Form
+                submitToGoogleForm(userData, 'login');
+                
+                // Update UI
+                fullNameInput.prop('disabled', true);
+                emailInput.prop('disabled', true);
+                loginBtn.prop('disabled', true);
+                logoutBtn.prop('disabled', false);
+                
+                isLoggedIn = true;
+                
+                // Show success message
+                statusMessage.text('Login successful!');
+                statusMessage.removeClass('failed').addClass('success').show();
+            });
+            
+            // Handle logout
+            logoutBtn.on('click', function() {
+                const userData = JSON.parse(localStorage.getItem('userData'));
+                userData.logoutTime = new Date().toISOString();
+                
+                // Update localStorage
+                localStorage.setItem('userData', JSON.stringify(userData));
+                
+                // Submit to Google Form
+                submitToGoogleForm(userData, 'logout');
+                
+                // Clear localStorage
+                localStorage.removeItem('userData');
+                
+                // Reset UI
+                fullNameInput.prop('disabled', false);
+                emailInput.prop('disabled', false);
+                loginBtn.prop('disabled', false);
+                logoutBtn.prop('disabled', true);
+                
+                isLoggedIn = false;
+                
+                // Show logout message
+                statusMessage.text('Logout successful!');
+                statusMessage.removeClass('failed').addClass('success').show();
+                
+                // Hide message after 3 seconds
+                setTimeout(function() {
+                    statusMessage.hide();
+                }, 3000);
+            });
+            
+            // Function to submit data to Google Form
+            function submitToGoogleForm(userData, action) {
+                try {
+                    // Create a form element
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    // Replace this URL with your actual Google Form submission URL
+                    form.action = 'https://docs.google.com/forms/d/e/1FAIpQLSe6C0v7Vwd8W1ck6wcKCph2EDxQap11UGzYpmdfJ58oAOSJiQ/formResponse';
+                    form.target = 'hiddenFrame';
+                    
+                    // Create hidden inputs for each field
+                    // These entry numbers should match your Google Form field IDs
+                    // Replace "entry.123456789" with your actual entry IDs
+                    const nameInput = document.createElement('input');
+                    nameInput.type = 'hidden';
+                    nameInput.name = 'entry.1849035150';  // Replace with your form's name field entry ID
+                    nameInput.value = userData.fullName;
+                    form.appendChild(nameInput);
+                    
+                    const emailInput = document.createElement('input');
+                    emailInput.type = 'hidden';
+                    emailInput.name = 'entry.1359401918';  // Replace with your form's email field entry ID
+                    emailInput.value = userData.email;
+                    form.appendChild(emailInput);
+                    
+                    const timeInput = document.createElement('input');
+                    timeInput.type = 'hidden';
+                    timeInput.name = 'entry.1585204396';  // Replace with your form's time field entry ID
+                    timeInput.value = action === 'login' ? userData.loginTime : userData.logoutTime;
+                    form.appendChild(timeInput);
+                    
+                    const actionInput = document.createElement('input');
+                    actionInput.type = 'hidden';
+                    actionInput.name = 'entry.1204481541';  // Replace with your form's action field entry ID
+                    actionInput.value = action;
+                    form.appendChild(actionInput);
+                    
+                    // Append form to body, submit it, then remove it
+                    document.body.appendChild(form);
+                    form.submit();
+                    document.body.removeChild(form);
+                    
+                    console.log(`${action} data sent to Google Form`);
+                    return true;
+                } catch (error) {
+                    console.error('Error submitting to Google Form:', error);
+                    return false;
+                }
+            }
+        });
+    </script>
 </body>
 </html>
