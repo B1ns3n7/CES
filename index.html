@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CES Community Monitoring System</title>
+    <title>CES Community Monitoring System 2</title>
     <style>
         * {
             box-sizing: border-box;
@@ -293,18 +293,8 @@
                 // Save to localStorage
                 localStorage.setItem('userData', JSON.stringify(userData));
                 
-                // Try all methods of submission for maximum compatibility
-                // Method 1: XMLHttpRequest
-                submitWithXHR(userData, 'login');
-                
-                // Method 2: Fetch API
-                submitWithFetch(userData, 'login');
-                
-                // Method 3: iframe form submission
-                submitWithIframe(userData, 'login');
-                
-                // Method 4: JSONP-like approach
-                submitWithJSONP(userData, 'login');
+                // Choose one submission method based on browser capabilities
+                submitForm(userData, 'login');
                 
                 // Update UI
                 fullNameInput.prop('disabled', true);
@@ -327,11 +317,8 @@
                 // Update localStorage
                 localStorage.setItem('userData', JSON.stringify(userData));
                 
-                // Try all methods of submission
-                submitWithXHR(userData, 'logout');
-                submitWithFetch(userData, 'logout');
-                submitWithIframe(userData, 'logout');
-                submitWithJSONP(userData, 'logout');
+                // Submit form data
+                submitForm(userData, 'logout');
                 
                 // Clear localStorage
                 localStorage.removeItem('userData');
@@ -354,7 +341,25 @@
                 }, 3000);
             });
             
-            // Method 1: XMLHttpRequest submission
+            // Unified submission function that uses the best available method
+            function submitForm(userData, action) {
+                // Try methods in order of preference until one succeeds
+                if (window.fetch) {
+                    // Use Fetch API if available (modern browsers)
+                    submitWithFetch(userData, action);
+                    console.log(`Using Fetch API for ${action} submission`);
+                } else if (window.XMLHttpRequest) {
+                    // Fall back to XMLHttpRequest (older browsers)
+                    submitWithXHR(userData, action);
+                    console.log(`Using XMLHttpRequest for ${action} submission`);
+                } else {
+                    // Last resort: iframe form submission (very old browsers)
+                    submitWithIframe(userData, action);
+                    console.log(`Using iframe for ${action} submission`);
+                }
+            }
+            
+            // XMLHttpRequest submission
             function submitWithXHR(userData, action) {
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', formUrl, true);
@@ -385,11 +390,9 @@
                 
                 // Send the request
                 xhr.send(data);
-                
-                console.log(`XHR: ${action} data sent to Google Form`);
             }
             
-            // Method 2: Fetch API submission
+            // Fetch API submission
             function submitWithFetch(userData, action) {
                 // Create form data with separate login/logout times
                 const formData = new FormData();
@@ -417,11 +420,9 @@
                     },
                     body: new URLSearchParams(formData)
                 });
-                
-                console.log(`Fetch: ${action} data sent to Google Form`);
             }
             
-            // Method 3: iframe form submission
+            // iframe form submission (fallback method)
             function submitWithIframe(userData, action) {
                 // Create a form element
                 const form = document.createElement('form');
@@ -478,48 +479,6 @@
                 setTimeout(() => {
                     document.body.removeChild(form);
                 }, 1000);
-                
-                console.log(`iframe: ${action} data sent to Google Form`);
-            }
-            
-            // Method 4: JSONP-like approach
-            function submitWithJSONP(userData, action) {
-                // Build the URL with query parameters
-                const timestamp = new Date().getTime();
-                let url = `${formUrl}?${formEntries.name}=${encodeURIComponent(userData.fullName)}`;
-                url += `&${formEntries.email}=${encodeURIComponent(userData.email)}`;
-                url += `&${formEntries.action}=${encodeURIComponent(action)}`;
-                
-                // Add appropriate timestamp based on action
-                if (action === 'login') {
-                    url += `&${formEntries.loginTime}=${encodeURIComponent(userData.loginTime)}`;
-                } else if (action === 'logout') {
-                    // Include both times for logout action
-                    url += `&${formEntries.loginTime}=${encodeURIComponent(userData.loginTime)}`;
-                    url += `&${formEntries.logoutTime}=${encodeURIComponent(userData.logoutTime)}`;
-                }
-                
-                // Add cache-busting parameter
-                url += `&_=${timestamp}`;
-                
-                // Create a script element
-                const script = document.createElement('script');
-                script.src = url;
-                
-                // Set onload handler to remove the script
-                script.onload = () => {
-                    document.body.removeChild(script);
-                };
-                
-                // Set onerror handler to remove the script
-                script.onerror = () => {
-                    document.body.removeChild(script);
-                };
-                
-                // Append script to body
-                document.body.appendChild(script);
-                
-                console.log(`JSONP: ${action} data sent to Google Form`);
             }
         });
     </script>
