@@ -19,6 +19,7 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            position: relative; /* Added for positioning attribution */
         }
         
         .container {
@@ -127,6 +128,16 @@
             height: 0;
         }
         
+        /* Added attribution style */
+        .attribution {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            color: #777;
+            z-index: 1000;
+        }
+        
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .container {
@@ -141,6 +152,9 @@
 </head>
 <body>
     <div class="container">
+        <div class="logo-container">
+            <img src="nulogo.png" alt="NU Laguna Logo" class="logo">
+        </div>
         <h1>CES Login-Logout System</h1>
         
         <!-- New Project Name field -->
@@ -169,6 +183,9 @@
         
         <div id="statusMessage" class="status"></div>
     </div>
+    
+    <!-- Added attribution div -->
+    <div class="attribution">by: Kulto ni Luna (Rose Ann, Edison, & Vincent)</div>
     
     <!-- Hidden iframe for form submission -->
     <iframe id="hiddenFrame" name="hiddenFrame"></iframe>
