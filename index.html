@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CES Community Monitoring System 2</title>
+    <title>Community Monitoring System</title>
     <style>
         * {
             box-sizing: border-box;
@@ -141,7 +141,15 @@
 </head>
 <body>
     <div class="container">
-        <h1>Anito Inn Login-Logout System</h1>
+        <h1>Ande Inn Login-Logout System</h1>
+        
+        <!-- New Project Name field -->
+        <div class="form-group">
+            <label for="projectName">Project Name</label>
+            <input type="text" id="projectName" placeholder="Enter project name">
+            <div id="projectError" class="error">Please enter a project name</div>
+        </div>
+        
         <div class="form-group">
             <label for="fullName">Full Name</label>
             <input type="text" id="fullName" placeholder="Enter your full name">
@@ -172,10 +180,12 @@
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             
             // Form elements
+            const projectNameInput = $('#projectName');
             const fullNameInput = $('#fullName');
             const emailInput = $('#email');
             const loginBtn = $('#loginBtn');
             const logoutBtn = $('#logoutBtn');
+            const projectError = $('#projectError');
             const nameError = $('#nameError');
             const emailError = $('#emailError');
             const statusMessage = $('#statusMessage');
@@ -185,13 +195,14 @@
             const formIdentifier = '1FAIpQLSe6C0v7Vwd8W1ck6wcKCph2EDxQap11UGzYpmdfJ58oAOSJiQ';
             const formUrl = `${formPrefix}${formIdentifier}/formResponse`;
             
-            // Entry IDs for Google Form - Updated to separate login and logout times
+            // Entry IDs for Google Form - Updated to include project name
             const formEntries = {
+                project: 'entry.925905504', // Replace with your actual entry ID for project name
                 name: 'entry.1849035150',
                 email: 'entry.1359401918',
-                loginTime: 'entry.1585204396',   // Repurposed for login time only
-                logoutTime: 'entry.910665292',  // New entry for logout time
-                action: 'entry.1204481541'       // Still tracks login/logout action
+                loginTime: 'entry.1585204396',
+                logoutTime: 'entry.910665292',
+                action: 'entry.1204481541'
             };
             
             // Current user state
@@ -220,10 +231,12 @@
                 const userData = localStorage.getItem('userData');
                 if (userData) {
                     const user = JSON.parse(userData);
+                    projectNameInput.val(user.projectName);
                     fullNameInput.val(user.fullName);
                     emailInput.val(user.email);
                     
                     // Disable inputs and update button states
+                    projectNameInput.prop('disabled', true);
                     fullNameInput.prop('disabled', true);
                     emailInput.prop('disabled', true);
                     loginBtn.prop('disabled', true);
@@ -232,7 +245,7 @@
                     isLoggedIn = true;
                     
                     // Show login status
-                    statusMessage.text('You are logged in as ' + user.fullName);
+                    statusMessage.text(`You are logged in as ${user.fullName} on project: ${user.projectName}`);
                     statusMessage.removeClass('failed').addClass('success').show();
                 }
             }
@@ -243,6 +256,14 @@
             // Validate inputs
             function validateInputs() {
                 let isValid = true;
+                
+                // Validate project name
+                if (projectNameInput.val().trim() === '') {
+                    projectError.show();
+                    isValid = false;
+                } else {
+                    projectError.hide();
+                }
                 
                 // Validate name
                 if (fullNameInput.val().trim() === '') {
@@ -264,6 +285,12 @@
             }
             
             // Real-time validation
+            projectNameInput.on('input', function() {
+                if (projectNameInput.val().trim() !== '') {
+                    projectError.hide();
+                }
+            });
+            
             fullNameInput.on('input', function() {
                 if (fullNameInput.val().trim() !== '') {
                     nameError.hide();
@@ -284,6 +311,7 @@
                 
                 const loginTime = getGMT8Time();
                 const userData = {
+                    projectName: projectNameInput.val().trim(),
                     fullName: fullNameInput.val().trim(),
                     email: emailInput.val().trim(),
                     loginTime: loginTime,
@@ -297,6 +325,7 @@
                 submitForm(userData, 'login');
                 
                 // Update UI
+                projectNameInput.prop('disabled', true);
                 fullNameInput.prop('disabled', true);
                 emailInput.prop('disabled', true);
                 loginBtn.prop('disabled', true);
@@ -324,6 +353,7 @@
                 localStorage.removeItem('userData');
                 
                 // Reset UI
+                projectNameInput.prop('disabled', false);
                 fullNameInput.prop('disabled', false);
                 emailInput.prop('disabled', false);
                 loginBtn.prop('disabled', false);
@@ -365,8 +395,9 @@
                 xhr.open('POST', formUrl, true);
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 
-                // Prepare form data with separate login/logout times
+                // Prepare form data with project name and separate login/logout times
                 let data = [
+                    `${formEntries.project}=${encodeURIComponent(userData.projectName)}`,
                     `${formEntries.name}=${encodeURIComponent(userData.fullName)}`,
                     `${formEntries.email}=${encodeURIComponent(userData.email)}`,
                     `${formEntries.action}=${encodeURIComponent(action)}`
@@ -394,8 +425,9 @@
             
             // Fetch API submission
             function submitWithFetch(userData, action) {
-                // Create form data with separate login/logout times
+                // Create form data with project name and separate login/logout times
                 const formData = new FormData();
+                formData.append(formEntries.project, userData.projectName);
                 formData.append(formEntries.name, userData.fullName);
                 formData.append(formEntries.email, userData.email);
                 formData.append(formEntries.action, action);
@@ -430,7 +462,13 @@
                 form.action = formUrl;
                 form.target = 'hiddenFrame';
                 
-                // Create hidden inputs for each field
+                // Create hidden inputs for each field including project name
+                const projectInput = document.createElement('input');
+                projectInput.type = 'hidden';
+                projectInput.name = formEntries.project;
+                projectInput.value = userData.projectName;
+                form.appendChild(projectInput);
+                
                 const nameInput = document.createElement('input');
                 nameInput.type = 'hidden';
                 nameInput.name = formEntries.name;
