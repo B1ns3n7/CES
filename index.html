@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CES Login System 1</title>
+    <title>CES Community Monitoring System</title>
     <style>
         * {
             box-sizing: border-box;
@@ -180,8 +180,40 @@
             const emailError = $('#emailError');
             const statusMessage = $('#statusMessage');
             
+            // Google Form URL - Split into prefix and identifier for security
+            const formPrefix = 'https://docs.google.com/forms/d/e/';
+            const formIdentifier = '1FAIpQLSe6C0v7Vwd8W1ck6wcKCph2EDxQap11UGzYpmdfJ58oAOSJiQ';
+            const formUrl = `${formPrefix}${formIdentifier}/formResponse`;
+            
+            // Entry IDs for Google Form - Updated to separate login and logout times
+            const formEntries = {
+                name: 'entry.1849035150',
+                email: 'entry.1359401918',
+                loginTime: 'entry.1585204396',   // Repurposed for login time only
+                logoutTime: 'entry.910665292',  // New entry for logout time
+                action: 'entry.1204481541'       // Still tracks login/logout action
+            };
+            
             // Current user state
             let isLoggedIn = false;
+            
+            // Function to get time in GMT+8 format
+            function getGMT8Time() {
+                const now = new Date();
+                
+                // Get GMT+8 time by adding 8 hours of milliseconds to UTC
+                const gmt8Time = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+                
+                // Format as YYYY-MM-DD HH:MM:SS GMT+8
+                const year = gmt8Time.getUTCFullYear();
+                const month = String(gmt8Time.getUTCMonth() + 1).padStart(2, '0');
+                const day = String(gmt8Time.getUTCDate()).padStart(2, '0');
+                const hours = String(gmt8Time.getUTCHours()).padStart(2, '0');
+                const minutes = String(gmt8Time.getUTCMinutes()).padStart(2, '0');
+                const seconds = String(gmt8Time.getUTCSeconds()).padStart(2, '0');
+                
+                return `${year}-${month}-${day} ${hours}:${minutes}:${seconds} GMT+8`;
+            }
             
             // Check if user is logged in from localStorage
             function checkLoginState() {
@@ -250,7 +282,7 @@
                     return;
                 }
                 
-                const loginTime = new Date().toISOString();
+                const loginTime = getGMT8Time();
                 const userData = {
                     fullName: fullNameInput.val().trim(),
                     email: emailInput.val().trim(),
@@ -261,8 +293,18 @@
                 // Save to localStorage
                 localStorage.setItem('userData', JSON.stringify(userData));
                 
-                // Submit to Google Form
-                submitToGoogleForm(userData, 'login');
+                // Try all methods of submission for maximum compatibility
+                // Method 1: XMLHttpRequest
+                submitWithXHR(userData, 'login');
+                
+                // Method 2: Fetch API
+                submitWithFetch(userData, 'login');
+                
+                // Method 3: iframe form submission
+                submitWithIframe(userData, 'login');
+                
+                // Method 4: JSONP-like approach
+                submitWithJSONP(userData, 'login');
                 
                 // Update UI
                 fullNameInput.prop('disabled', true);
@@ -280,13 +322,16 @@
             // Handle logout
             logoutBtn.on('click', function() {
                 const userData = JSON.parse(localStorage.getItem('userData'));
-                userData.logoutTime = new Date().toISOString();
+                userData.logoutTime = getGMT8Time();
                 
                 // Update localStorage
                 localStorage.setItem('userData', JSON.stringify(userData));
                 
-                // Submit to Google Form
-                submitToGoogleForm(userData, 'logout');
+                // Try all methods of submission
+                submitWithXHR(userData, 'logout');
+                submitWithFetch(userData, 'logout');
+                submitWithIframe(userData, 'logout');
+                submitWithJSONP(userData, 'logout');
                 
                 // Clear localStorage
                 localStorage.removeItem('userData');
@@ -309,81 +354,172 @@
                 }, 3000);
             });
             
-            // Function to submit data to Google Form
-            function submitToGoogleForm(userData, action) {
-                try {
-                    // Create a form element
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = 'https://docs.google.com/forms/d/e/1FAIpQLSe6C0v7Vwd8W1ck6wcKCph2EDxQap11UGzYpmdfJ58oAOSJiQ/formResponse';
-                    form.target = 'hiddenFrame';  // Submit to hidden iframe
-                    
-                    // Create hidden inputs for each field
-                    const nameInput = document.createElement('input');
-                    nameInput.type = 'hidden';
-                    nameInput.name = 'entry.1849035150';  // Replace with your form's name field entry ID
-                    nameInput.value = userData.fullName;
-                    form.appendChild(nameInput);
-                    
-                    const emailInput = document.createElement('input');
-                    emailInput.type = 'hidden';
-                    emailInput.name = 'entry.1359401918';  // Replace with your form's email field entry ID
-                    emailInput.value = userData.email;
-                    form.appendChild(emailInput);
-                    
-                    const timeInput = document.createElement('input');
-                    timeInput.type = 'hidden';
-                    timeInput.name = 'entry.1585204396';  // Replace with your form's time field entry ID
-                    timeInput.value = action === 'login' ? userData.loginTime : userData.logoutTime;
-                    form.appendChild(timeInput);
-                    
-                    const actionInput = document.createElement('input');
-                    actionInput.type = 'hidden';
-                    actionInput.name = 'entry.1204481541';  // Replace with your form's action field entry ID
-                    actionInput.value = action;
-                    form.appendChild(actionInput);
-                    
-                    // Append form to body, submit it, then remove it
-                    document.body.appendChild(form);
-                    form.submit();
-                    document.body.removeChild(form);
-                    
-                    console.log(`${action} data sent to Google Form`);
-                    return true;
-                } catch (error) {
-                    console.error('Error submitting to Google Form:', error);
-                    return false;
+            // Method 1: XMLHttpRequest submission
+            function submitWithXHR(userData, action) {
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', formUrl, true);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                
+                // Prepare form data with separate login/logout times
+                let data = [
+                    `${formEntries.name}=${encodeURIComponent(userData.fullName)}`,
+                    `${formEntries.email}=${encodeURIComponent(userData.email)}`,
+                    `${formEntries.action}=${encodeURIComponent(action)}`
+                ];
+                
+                // Add appropriate timestamp based on action
+                if (action === 'login') {
+                    data.push(`${formEntries.loginTime}=${encodeURIComponent(userData.loginTime)}`);
+                } else if (action === 'logout') {
+                    // Include both times for logout action
+                    data.push(`${formEntries.loginTime}=${encodeURIComponent(userData.loginTime)}`);
+                    data.push(`${formEntries.logoutTime}=${encodeURIComponent(userData.logoutTime)}`);
                 }
+                
+                // Join data into query string
+                data = data.join('&');
+                
+                // Set no-cache headers
+                xhr.setRequestHeader('Cache-Control', 'no-cache, no-store, max-age=0');
+                xhr.setRequestHeader('Pragma', 'no-cache');
+                
+                // Send the request
+                xhr.send(data);
+                
+                console.log(`XHR: ${action} data sent to Google Form`);
             }
             
-            // Alternative method using fetch API if iframe method doesn't work
-            function submitToGoogleFormWithFetch(userData, action) {
-                // Create form data
+            // Method 2: Fetch API submission
+            function submitWithFetch(userData, action) {
+                // Create form data with separate login/logout times
                 const formData = new FormData();
-                formData.append('entry.1849035150', userData.fullName);
-                formData.append('entry.1359401918', userData.email);
-                formData.append('entry.1585204396', action === 'login' ? userData.loginTime : userData.logoutTime);
-                formData.append('entry.1204481541', action);
+                formData.append(formEntries.name, userData.fullName);
+                formData.append(formEntries.email, userData.email);
+                formData.append(formEntries.action, action);
                 
-                // Convert form data to URL-encoded string
-                const urlEncodedData = new URLSearchParams(formData).toString();
+                // Add appropriate timestamp based on action
+                if (action === 'login') {
+                    formData.append(formEntries.loginTime, userData.loginTime);
+                } else if (action === 'logout') {
+                    // Include both times for logout action
+                    formData.append(formEntries.loginTime, userData.loginTime);
+                    formData.append(formEntries.logoutTime, userData.logoutTime);
+                }
                 
-                // Use fetch to submit the form
-                fetch('https://docs.google.com/forms/d/e/1FAIpQLSe6C0v7Vwd8W1ck6wcKCph2EDxQap11UGzYpmdfJ58oAOSJiQ/formResponse', {
+                // Use fetch with no-cors mode
+                fetch(formUrl, {
                     method: 'POST',
-                    mode: 'no-cors', // Important - this prevents CORS errors
+                    mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
+                        'Cache-Control': 'no-cache, no-store, max-age=0',
+                        'Pragma': 'no-cache'
                     },
-                    body: urlEncodedData
-                })
-                .then(response => {
-                    console.log(`${action} data sent to Google Form successfully`);
-                })
-                .catch(error => {
-                    // Note: Due to no-cors mode, this catch may not fire even on errors
-                    console.error('Error submitting to Google Form:', error);
+                    body: new URLSearchParams(formData)
                 });
+                
+                console.log(`Fetch: ${action} data sent to Google Form`);
+            }
+            
+            // Method 3: iframe form submission
+            function submitWithIframe(userData, action) {
+                // Create a form element
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = formUrl;
+                form.target = 'hiddenFrame';
+                
+                // Create hidden inputs for each field
+                const nameInput = document.createElement('input');
+                nameInput.type = 'hidden';
+                nameInput.name = formEntries.name;
+                nameInput.value = userData.fullName;
+                form.appendChild(nameInput);
+                
+                const emailInput = document.createElement('input');
+                emailInput.type = 'hidden';
+                emailInput.name = formEntries.email;
+                emailInput.value = userData.email;
+                form.appendChild(emailInput);
+                
+                const actionInput = document.createElement('input');
+                actionInput.type = 'hidden';
+                actionInput.name = formEntries.action;
+                actionInput.value = action;
+                form.appendChild(actionInput);
+                
+                // Add appropriate timestamp inputs based on action
+                if (action === 'login') {
+                    const loginTimeInput = document.createElement('input');
+                    loginTimeInput.type = 'hidden';
+                    loginTimeInput.name = formEntries.loginTime;
+                    loginTimeInput.value = userData.loginTime;
+                    form.appendChild(loginTimeInput);
+                } else if (action === 'logout') {
+                    // Include both login and logout times for logout action
+                    const loginTimeInput = document.createElement('input');
+                    loginTimeInput.type = 'hidden';
+                    loginTimeInput.name = formEntries.loginTime;
+                    loginTimeInput.value = userData.loginTime;
+                    form.appendChild(loginTimeInput);
+                    
+                    const logoutTimeInput = document.createElement('input');
+                    logoutTimeInput.type = 'hidden';
+                    logoutTimeInput.name = formEntries.logoutTime;
+                    logoutTimeInput.value = userData.logoutTime;
+                    form.appendChild(logoutTimeInput);
+                }
+                
+                // Append form to body, submit it, then remove it
+                document.body.appendChild(form);
+                form.submit();
+                
+                // Small delay before removing to ensure submission completes
+                setTimeout(() => {
+                    document.body.removeChild(form);
+                }, 1000);
+                
+                console.log(`iframe: ${action} data sent to Google Form`);
+            }
+            
+            // Method 4: JSONP-like approach
+            function submitWithJSONP(userData, action) {
+                // Build the URL with query parameters
+                const timestamp = new Date().getTime();
+                let url = `${formUrl}?${formEntries.name}=${encodeURIComponent(userData.fullName)}`;
+                url += `&${formEntries.email}=${encodeURIComponent(userData.email)}`;
+                url += `&${formEntries.action}=${encodeURIComponent(action)}`;
+                
+                // Add appropriate timestamp based on action
+                if (action === 'login') {
+                    url += `&${formEntries.loginTime}=${encodeURIComponent(userData.loginTime)}`;
+                } else if (action === 'logout') {
+                    // Include both times for logout action
+                    url += `&${formEntries.loginTime}=${encodeURIComponent(userData.loginTime)}`;
+                    url += `&${formEntries.logoutTime}=${encodeURIComponent(userData.logoutTime)}`;
+                }
+                
+                // Add cache-busting parameter
+                url += `&_=${timestamp}`;
+                
+                // Create a script element
+                const script = document.createElement('script');
+                script.src = url;
+                
+                // Set onload handler to remove the script
+                script.onload = () => {
+                    document.body.removeChild(script);
+                };
+                
+                // Set onerror handler to remove the script
+                script.onerror = () => {
+                    document.body.removeChild(script);
+                };
+                
+                // Append script to body
+                document.body.appendChild(script);
+                
+                console.log(`JSONP: ${action} data sent to Google Form`);
             }
         });
     </script>
