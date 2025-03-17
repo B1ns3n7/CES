@@ -212,14 +212,16 @@
             const formIdentifier = '1FAIpQLSe6C0v7Vwd8W1ck6wcKCph2EDxQap11UGzYpmdfJ58oAOSJiQ';
             const formUrl = `${formPrefix}${formIdentifier}/formResponse`;
             
-            // Entry IDs for Google Form - Updated to include project name
+            // Entry IDs for Google Form - Updated to include project name and location
             const formEntries = {
-                project: 'entry.925905504', // Replace with your actual entry ID for project name
+                project: 'entry.925905504',
                 name: 'entry.1849035150',
                 email: 'entry.1359401918',
                 loginTime: 'entry.1585204396',
                 logoutTime: 'entry.910665292',
-                action: 'entry.1204481541'
+                action: 'entry.1204481541',
+                loginLocation: 'entry.1789535182', // Replace with your actual entry ID for login location
+                logoutLocation: 'entry.2125902341'  // Replace with your actual entry ID for logout location
             };
             
             // Current user state
@@ -241,6 +243,72 @@
                 const seconds = String(gmt8Time.getUTCSeconds()).padStart(2, '0');
                 
                 return `${year}-${month}-${day} ${hours}:${minutes}:${seconds} GMT+8`;
+            }
+            
+            // Function to get current location as a readable address
+            function getCurrentLocation() {
+                return new Promise((resolve, reject) => {
+                    if (!navigator.geolocation) {
+                        resolve("Geolocation not supported");
+                        return;
+                    }
+                    
+                    navigator.geolocation.getCurrentPosition(
+                        position => {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            
+                            // Use reverse geocoding to get a readable address
+                            getAddressFromCoordinates(lat, lng)
+                                .then(address => {
+                                    resolve(address);
+                                })
+                                .catch(error => {
+                                    console.warn('Error getting address:', error);
+                                    resolve("Location could not be determined");
+                                });
+                        },
+                        error => {
+                            console.warn(`ERROR(${error.code}): ${error.message}`);
+                            resolve("Location permission denied");
+                        },
+                        { 
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 0
+                        }
+                    );
+                });
+            }
+            
+            // Function to convert coordinates to address using reverse geocoding
+            function getAddressFromCoordinates(lat, lng) {
+                return new Promise((resolve, reject) => {
+                    // Use OpenStreetMap's Nominatim service for reverse geocoding (it's free and doesn't require API key)
+                    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+                    
+                    fetch(url, {
+                        headers: {
+                            'Accept': 'application/json',
+                            'User-Agent': 'CES Login-Logout System' // It's polite to identify your app
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.display_name) {
+                            // Format the address nicely - this returns a well-formatted address string
+                            resolve(data.display_name);
+                        } else {
+                            // Fallback to coordinates if address can't be determined
+                            resolve(`Near ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                        }
+                    })
+                    .catch(error => {
+                        console.warn('Geocoding failed:', error);
+                        // Fallback to coordinates if geocoding fails
+                        resolve(`Near ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                    });
+                });
             }
             
             // Check if user is logged in from localStorage
@@ -321,18 +389,25 @@
             });
             
             // Handle login
-            loginBtn.on('click', function() {
+            loginBtn.on('click', async function() {
                 if (!validateInputs()) {
                     return;
                 }
                 
+                loginBtn.prop('disabled', true);
+                loginBtn.text('Getting location...');
+                
                 const loginTime = getGMT8Time();
+                const loginLocation = await getCurrentLocation();
+                
                 const userData = {
                     projectName: projectNameInput.val().trim(),
                     fullName: fullNameInput.val().trim(),
                     email: emailInput.val().trim(),
                     loginTime: loginTime,
-                    logoutTime: null
+                    loginLocation: loginLocation,
+                    logoutTime: null,
+                    logoutLocation: null
                 };
                 
                 // Save to localStorage
@@ -346,6 +421,7 @@
                 fullNameInput.prop('disabled', true);
                 emailInput.prop('disabled', true);
                 loginBtn.prop('disabled', true);
+                loginBtn.text('Login');
                 logoutBtn.prop('disabled', false);
                 
                 isLoggedIn = true;
@@ -356,9 +432,13 @@
             });
             
             // Handle logout
-            logoutBtn.on('click', function() {
+            logoutBtn.on('click', async function() {
+                logoutBtn.prop('disabled', true);
+                logoutBtn.text('Getting location...');
+                
                 const userData = JSON.parse(localStorage.getItem('userData'));
                 userData.logoutTime = getGMT8Time();
+                userData.logoutLocation = await getCurrentLocation();
                 
                 // Update localStorage
                 localStorage.setItem('userData', JSON.stringify(userData));
@@ -369,12 +449,13 @@
                 // Clear localStorage
                 localStorage.removeItem('userData');
                 
-                // Reset UI
+// Reset UI
                 projectNameInput.prop('disabled', false);
                 fullNameInput.prop('disabled', false);
                 emailInput.prop('disabled', false);
                 loginBtn.prop('disabled', false);
                 logoutBtn.prop('disabled', true);
+                logoutBtn.text('Logout');
                 
                 isLoggedIn = false;
                 
@@ -419,27 +500,30 @@
                     `${formEntries.email}=${encodeURIComponent(userData.email)}`,
                     `${formEntries.action}=${encodeURIComponent(action)}`
                 ];
-                
-                // Add appropriate timestamp based on action
+
+                // Add appropriate timestamp and location based on action
                 if (action === 'login') {
                     data.push(`${formEntries.loginTime}=${encodeURIComponent(userData.loginTime)}`);
+                    data.push(`${formEntries.loginLocation}=${encodeURIComponent(userData.loginLocation)}`);
                 } else if (action === 'logout') {
-                    // Include both times for logout action
+                    // Include both times and locations for logout action
                     data.push(`${formEntries.loginTime}=${encodeURIComponent(userData.loginTime)}`);
                     data.push(`${formEntries.logoutTime}=${encodeURIComponent(userData.logoutTime)}`);
+                    data.push(`${formEntries.loginLocation}=${encodeURIComponent(userData.loginLocation)}`);
+                    data.push(`${formEntries.logoutLocation}=${encodeURIComponent(userData.logoutLocation)}`);
                 }
-                
+
                 // Join data into query string
                 data = data.join('&');
-                
+
                 // Set no-cache headers
                 xhr.setRequestHeader('Cache-Control', 'no-cache, no-store, max-age=0');
                 xhr.setRequestHeader('Pragma', 'no-cache');
-                
+
                 // Send the request
                 xhr.send(data);
             }
-            
+
             // Fetch API submission
             function submitWithFetch(userData, action) {
                 // Create form data with project name and separate login/logout times
@@ -449,13 +533,16 @@
                 formData.append(formEntries.email, userData.email);
                 formData.append(formEntries.action, action);
                 
-                // Add appropriate timestamp based on action
+                // Add appropriate timestamp and location based on action
                 if (action === 'login') {
                     formData.append(formEntries.loginTime, userData.loginTime);
+                    formData.append(formEntries.loginLocation, userData.loginLocation);
                 } else if (action === 'logout') {
-                    // Include both times for logout action
+                    // Include both times and locations for logout action
                     formData.append(formEntries.loginTime, userData.loginTime);
                     formData.append(formEntries.logoutTime, userData.logoutTime);
+                    formData.append(formEntries.loginLocation, userData.loginLocation);
+                    formData.append(formEntries.logoutLocation, userData.logoutLocation);
                 }
                 
                 // Use fetch with no-cors mode
@@ -470,7 +557,7 @@
                     body: new URLSearchParams(formData)
                 });
             }
-            
+
             // iframe form submission (fallback method)
             function submitWithIframe(userData, action) {
                 // Create a form element
@@ -504,15 +591,21 @@
                 actionInput.value = action;
                 form.appendChild(actionInput);
                 
-                // Add appropriate timestamp inputs based on action
+                // Add appropriate timestamp and location inputs based on action
                 if (action === 'login') {
                     const loginTimeInput = document.createElement('input');
                     loginTimeInput.type = 'hidden';
                     loginTimeInput.name = formEntries.loginTime;
                     loginTimeInput.value = userData.loginTime;
                     form.appendChild(loginTimeInput);
+                    
+                    const loginLocationInput = document.createElement('input');
+                    loginLocationInput.type = 'hidden';
+                    loginLocationInput.name = formEntries.loginLocation;
+                    loginLocationInput.value = userData.loginLocation;
+                    form.appendChild(loginLocationInput);
                 } else if (action === 'logout') {
-                    // Include both login and logout times for logout action
+                    // Include both login and logout times and locations for logout action
                     const loginTimeInput = document.createElement('input');
                     loginTimeInput.type = 'hidden';
                     loginTimeInput.name = formEntries.loginTime;
@@ -524,6 +617,18 @@
                     logoutTimeInput.name = formEntries.logoutTime;
                     logoutTimeInput.value = userData.logoutTime;
                     form.appendChild(logoutTimeInput);
+                    
+                    const loginLocationInput = document.createElement('input');
+                    loginLocationInput.type = 'hidden';
+                    loginLocationInput.name = formEntries.loginLocation;
+                    loginLocationInput.value = userData.loginLocation;
+                    form.appendChild(loginLocationInput);
+                    
+                    const logoutLocationInput = document.createElement('input');
+                    logoutLocationInput.type = 'hidden';
+                    logoutLocationInput.name = formEntries.logoutLocation;
+                    logoutLocationInput.value = userData.logoutLocation;
+                    form.appendChild(logoutLocationInput);
                 }
                 
                 // Append form to body, submit it, then remove it
