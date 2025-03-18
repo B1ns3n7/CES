@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CES Monitoring System App</title>
+    <title>CES Monitoring System</title>
     <style>
         * {
             box-sizing: border-box;
@@ -19,7 +19,7 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
-            position: relative; /* Added for positioning attribution */
+            position: relative; 
         }
         
         .container {
@@ -138,6 +138,13 @@
             z-index: 1000;
         }
         
+        /* Time elapsed styling */
+        .time-elapsed {
+            margin-top: 10px;
+            font-weight: 600;
+            color: #444;
+        }
+        
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .container {
@@ -184,10 +191,9 @@
         <div id="statusMessage" class="status"></div>
     </div>
     
-    <!-- Added attribution div -->
+
     <div class="attribution"> by: Kulto ni Luna (Vincent, Rose Ann, & Edison)</div>
     
-    <!-- Hidden iframe for form submission -->
     <iframe id="hiddenFrame" name="hiddenFrame"></iframe>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
@@ -207,12 +213,11 @@
             const emailError = $('#emailError');
             const statusMessage = $('#statusMessage');
             
-            // Google Form URL - Split into prefix and identifier for security
             const formPrefix = 'https://docs.google.com/forms/d/e/';
             const formIdentifier = '1FAIpQLSe6C0v7Vwd8W1ck6wcKCph2EDxQap11UGzYpmdfJ58oAOSJiQ';
             const formUrl = `${formPrefix}${formIdentifier}/formResponse`;
             
-            // Entry IDs for Google Form - Updated to include project name and location
+            // Entry IDs for Google Form 
             const formEntries = {
                 project: 'entry.925905504',
                 name: 'entry.1849035150',
@@ -220,14 +225,15 @@
                 loginTime: 'entry.1585204396',
                 logoutTime: 'entry.910665292',
                 action: 'entry.1204481541',
-                loginLocation: 'entry.1789535182', // Replace with your actual entry ID for login location
-                logoutLocation: 'entry.2125902341'  // Replace with your actual entry ID for logout location
+                loginLocation: 'entry.1789535182',
+                logoutLocation: 'entry.2125902341',
+                timeElapsed: 'entry.1472467140'  
             };
             
             // Current user state
             let isLoggedIn = false;
             
-            // Function to get time in GMT+8 format
+            // Function to get time 
             function getGMT8Time() {
                 const now = new Date();
                 
@@ -245,7 +251,49 @@
                 return `${year}-${month}-${day} ${hours}:${minutes}:${seconds} GMT+8`;
             }
             
-            // Function to get current location as a readable address
+            // Function to get Date object from formatted GMT+8 string
+            function parseGMT8Time(timeString) {
+                // Format: YYYY-MM-DD HH:MM:SS GMT+8
+                const regex = /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2}) GMT\+8/;
+                const match = timeString.match(regex);
+                
+                if (match) {
+                    const year = parseInt(match[1]);
+                    const month = parseInt(match[2]) - 1; 
+                    const day = parseInt(match[3]);
+                    const hours = parseInt(match[4]);
+                    const minutes = parseInt(match[5]);
+                    const seconds = parseInt(match[6]);
+                    
+                    // Create date in UTC then adjust for GMT+8
+                    const date = new Date(Date.UTC(year, month, day, hours, minutes, seconds));
+                    return date;
+                }
+                
+                return null;
+            }
+            
+            // Compute the elapsed time between login and logout
+            function calculateTimeElapsed(loginTime, logoutTime) {
+                const loginDate = parseGMT8Time(loginTime);
+                const logoutDate = parseGMT8Time(logoutTime);
+                
+                if (!loginDate || !logoutDate) {
+                    return "Invalid time format";
+                }
+                
+                // difference in milliseconds
+                const diffMs = logoutDate - loginDate;
+                
+                // Convert to hours and minutes
+                const hours = Math.floor(diffMs / (1000 * 60 * 60));
+                const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                
+                // Format the result
+                return `${hours} hour(s) and ${minutes} minute(s)`;
+            }
+            
+            // Get current location as a readable address
             function getCurrentLocation() {
                 return new Promise((resolve, reject) => {
                     if (!navigator.geolocation) {
@@ -290,13 +338,13 @@
                     fetch(url, {
                         headers: {
                             'Accept': 'application/json',
-                            'User-Agent': 'CES Login-Logout System' // It's polite to identify your app
+                            'User-Agent': 'CES Login-Logout System' 
                         }
                     })
                     .then(response => response.json())
                     .then(data => {
                         if (data && data.display_name) {
-                            // Format the address nicely - this returns a well-formatted address string
+                            // Returns a well-formatted address string
                             resolve(data.display_name);
                         } else {
                             // Fallback to coordinates if address can't be determined
@@ -407,7 +455,8 @@
                     loginTime: loginTime,
                     loginLocation: loginLocation,
                     logoutTime: null,
-                    logoutLocation: null
+                    logoutLocation: null,
+                    timeElapsed: null
                 };
                 
                 // Save to localStorage
@@ -440,33 +489,38 @@
                 userData.logoutTime = getGMT8Time();
                 userData.logoutLocation = await getCurrentLocation();
                 
+                // Calculate time elapsed
+                userData.timeElapsed = calculateTimeElapsed(userData.loginTime, userData.logoutTime);
+                
                 // Update localStorage
                 localStorage.setItem('userData', JSON.stringify(userData));
                 
                 // Submit form data
                 submitForm(userData, 'logout');
                 
-                // Clear localStorage
-                localStorage.removeItem('userData');
-                
-// Reset UI
-                projectNameInput.prop('disabled', false);
-                fullNameInput.prop('disabled', false);
-                emailInput.prop('disabled', false);
-                loginBtn.prop('disabled', false);
-                logoutBtn.prop('disabled', true);
-                logoutBtn.text('Logout');
-                
-                isLoggedIn = false;
-                
-                // Show logout message
-                statusMessage.text('Logout successful!');
+                // Update status message with time elapsed
+                statusMessage.html(`Logout successful!<div class="time-elapsed">Time elapsed: ${userData.timeElapsed}</div>`);
                 statusMessage.removeClass('failed').addClass('success').show();
                 
-                // Hide message after 3 seconds
+                // Clear localStorage after a short delay to allow message to be seen
+                setTimeout(function() {
+                    localStorage.removeItem('userData');
+                    
+                    // Reset UI
+                    projectNameInput.prop('disabled', false);
+                    fullNameInput.prop('disabled', false);
+                    emailInput.prop('disabled', false);
+                    loginBtn.prop('disabled', false);
+                    logoutBtn.prop('disabled', true);
+                    logoutBtn.text('Logout');
+                    
+                    isLoggedIn = false;
+                }, 5000);
+                
+                // Hide message after 8 seconds
                 setTimeout(function() {
                     statusMessage.hide();
-                }, 3000);
+                }, 8000);
             });
             
             // Unified submission function that uses the best available method
@@ -506,11 +560,12 @@
                     data.push(`${formEntries.loginTime}=${encodeURIComponent(userData.loginTime)}`);
                     data.push(`${formEntries.loginLocation}=${encodeURIComponent(userData.loginLocation)}`);
                 } else if (action === 'logout') {
-                    // Include both times and locations for logout action
+                    // Include both times, locations, and time elapsed for logout action
                     data.push(`${formEntries.loginTime}=${encodeURIComponent(userData.loginTime)}`);
                     data.push(`${formEntries.logoutTime}=${encodeURIComponent(userData.logoutTime)}`);
                     data.push(`${formEntries.loginLocation}=${encodeURIComponent(userData.loginLocation)}`);
                     data.push(`${formEntries.logoutLocation}=${encodeURIComponent(userData.logoutLocation)}`);
+                    data.push(`${formEntries.timeElapsed}=${encodeURIComponent(userData.timeElapsed)}`);
                 }
 
                 // Join data into query string
@@ -538,11 +593,12 @@
                     formData.append(formEntries.loginTime, userData.loginTime);
                     formData.append(formEntries.loginLocation, userData.loginLocation);
                 } else if (action === 'logout') {
-                    // Include both times and locations for logout action
+                    // Include both times, locations, and time elapsed for logout action
                     formData.append(formEntries.loginTime, userData.loginTime);
                     formData.append(formEntries.logoutTime, userData.logoutTime);
                     formData.append(formEntries.loginLocation, userData.loginLocation);
                     formData.append(formEntries.logoutLocation, userData.logoutLocation);
+                    formData.append(formEntries.timeElapsed, userData.timeElapsed);
                 }
                 
                 // Use fetch with no-cors mode
@@ -605,7 +661,7 @@
                     loginLocationInput.value = userData.loginLocation;
                     form.appendChild(loginLocationInput);
                 } else if (action === 'logout') {
-                    // Include both login and logout times and locations for logout action
+                    // Include both login and logout times, locations, and time elapsed for logout action
                     const loginTimeInput = document.createElement('input');
                     loginTimeInput.type = 'hidden';
                     loginTimeInput.name = formEntries.loginTime;
@@ -629,6 +685,12 @@
                     logoutLocationInput.name = formEntries.logoutLocation;
                     logoutLocationInput.value = userData.logoutLocation;
                     form.appendChild(logoutLocationInput);
+                    
+                    const timeElapsedInput = document.createElement('input');
+                    timeElapsedInput.type = 'hidden';
+                    timeElapsedInput.name = formEntries.timeElapsed;
+                    timeElapsedInput.value = userData.timeElapsed;
+                    form.appendChild(timeElapsedInput);
                 }
                 
                 // Append form to body, submit it, then remove it
