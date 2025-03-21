@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CES Monitoring System</title>
+    <title>Community Monitoring System</title>
     <style>
         * {
             box-sizing: border-box;
@@ -145,6 +145,90 @@
             color: #444;
         }
         
+        /* Summary modal styling */
+        .summary-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .summary-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .summary-header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #4a90e2;
+        }
+        
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .summary-table th, 
+        .summary-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        
+        .summary-table th {
+            background-color: #f8f8f8;
+            font-weight: 600;
+        }
+        
+        .summary-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .summary-actions button {
+            flex: 1;
+            max-width: 180px;
+        }
+        
+        #closeBtn {
+            background-color: #777;
+        }
+        
+        #closeBtn:hover {
+            background-color: #555;
+        }
+        
+        /*#emailBtn {
+            background-color: #27ae60;
+        }
+        
+        #emailBtn:hover {
+            background-color: #219955;
+        }*/
+        
+        #screenshotBtn {
+            background-color: #f39c12;
+        }
+        
+        #screenshotBtn:hover {
+            background-color: #e67e22;
+        }
+        
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .container {
@@ -153,6 +237,19 @@
             
             .button-group {
                 flex-direction: column;
+            }
+            
+            .summary-content {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .summary-actions {
+                flex-direction: column;
+            }
+            
+            .summary-actions button {
+                max-width: none;
             }
         }
     </style>
@@ -164,7 +261,14 @@
         </div>
         <h1>CES Login-Logout System</h1>
         
-        <!-- New Project Name field -->
+        <!-- New Community field -->
+        <div class="form-group">
+            <label for="community">Community Location</label>
+            <input type="text" id="community" placeholder="Enter partner community">
+            <div id="communityError" class="error">Please enter the community location</div>
+        </div>
+        
+        <!-- Project Name field -->
         <div class="form-group">
             <label for="projectName">Project Name</label>
             <input type="text" id="projectName" placeholder="Enter project name">
@@ -191,27 +295,55 @@
         <div id="statusMessage" class="status"></div>
     </div>
     
+    <!-- Summary Modal -->
+    <div id="summaryModal" class="summary-modal">
+        <div class="summary-content" id="summaryContent">
+            <h2 class="summary-header">Community Service Summary</h2>
+            <table class="summary-table" id="summaryTable">
+                <tr>
+                    <th>Information</th>
+                    <th>Details</th>
+                </tr>
+            </table>
+            <div class="summary-actions">
+                <!-- <button id="emailBtn">Email Summary</button> -->
+                <button id="screenshotBtn">Download Summary</button>
+                <button id="closeBtn">Close</button>
+            </div>
+        </div>
+    </div>
 
-    <div class="attribution"> by: Kulto ni Luna (Vincent, Rose Ann, & Edison)</div>
+    <div class="attribution">by: Kulto ni Luna (Vincent, Rose Ann, & Edison)</div>
     
     <iframe id="hiddenFrame" name="hiddenFrame"></iframe>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
         $(document).ready(function() {
             // Email validation regex
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             
             // Form elements
+            const communityInput = $('#community');
             const projectNameInput = $('#projectName');
             const fullNameInput = $('#fullName');
             const emailInput = $('#email');
             const loginBtn = $('#loginBtn');
             const logoutBtn = $('#logoutBtn');
+            const communityError = $('#communityError');
             const projectError = $('#projectError');
             const nameError = $('#nameError');
             const emailError = $('#emailError');
             const statusMessage = $('#statusMessage');
+            
+            // Summary modal elements
+            const summaryModal = $('#summaryModal');
+            const summaryTable = $('#summaryTable');
+            const emailBtn = $('#emailBtn');
+            const screenshotBtn = $('#screenshotBtn');
+            const closeBtn = $('#closeBtn');
+            const summaryContent = $('#summaryContent');
             
             const formPrefix = 'https://docs.google.com/forms/d/e/';
             const formIdentifier = '1FAIpQLSe6C0v7Vwd8W1ck6wcKCph2EDxQap11UGzYpmdfJ58oAOSJiQ';
@@ -219,6 +351,7 @@
             
             // Entry IDs for Google Form 
             const formEntries = {
+                community: 'entry.1870999305', // Community field
                 project: 'entry.925905504',
                 name: 'entry.1849035150',
                 email: 'entry.1359401918',
@@ -233,7 +366,7 @@
             // Current user state
             let isLoggedIn = false;
             
-            // Function to get time 
+            // Function to get time in GMT+8 
             function getGMT8Time() {
                 const now = new Date();
                 
@@ -313,7 +446,7 @@
                                 })
                                 .catch(error => {
                                     console.warn('Error getting address:', error);
-                                    resolve("Location could not be determined");
+                                    resolve(`Near ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
                                 });
                         },
                         error => {
@@ -332,7 +465,7 @@
             // Function to convert coordinates to address using reverse geocoding
             function getAddressFromCoordinates(lat, lng) {
                 return new Promise((resolve, reject) => {
-                    // Use OpenStreetMap's Nominatim service for reverse geocoding (it's free and doesn't require API key)
+                    // Use OpenStreetMap's Nominatim service for reverse geocoding
                     const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
                     
                     fetch(url, {
@@ -364,11 +497,13 @@
                 const userData = localStorage.getItem('userData');
                 if (userData) {
                     const user = JSON.parse(userData);
+                    communityInput.val(user.community);
                     projectNameInput.val(user.projectName);
                     fullNameInput.val(user.fullName);
                     emailInput.val(user.email);
                     
                     // Disable inputs and update button states
+                    communityInput.prop('disabled', true);
                     projectNameInput.prop('disabled', true);
                     fullNameInput.prop('disabled', true);
                     emailInput.prop('disabled', true);
@@ -378,7 +513,7 @@
                     isLoggedIn = true;
                     
                     // Show login status
-                    statusMessage.text(`You are logged in as ${user.fullName} on project: ${user.projectName}`);
+                    statusMessage.text(`You are logged in as ${user.fullName} on project: ${user.projectName} at ${user.community}`);
                     statusMessage.removeClass('failed').addClass('success').show();
                 }
             }
@@ -389,6 +524,14 @@
             // Validate inputs
             function validateInputs() {
                 let isValid = true;
+                
+                // Validate community
+                if (communityInput.val().trim() === '') {
+                    communityError.show();
+                    isValid = false;
+                } else {
+                    communityError.hide();
+                }
                 
                 // Validate project name
                 if (projectNameInput.val().trim() === '') {
@@ -418,6 +561,12 @@
             }
             
             // Real-time validation
+            communityInput.on('input', function() {
+                if (communityInput.val().trim() !== '') {
+                    communityError.hide();
+                }
+            });
+            
             projectNameInput.on('input', function() {
                 if (projectNameInput.val().trim() !== '') {
                     projectError.hide();
@@ -449,6 +598,7 @@
                 const loginLocation = await getCurrentLocation();
                 
                 const userData = {
+                    community: communityInput.val().trim(),
                     projectName: projectNameInput.val().trim(),
                     fullName: fullNameInput.val().trim(),
                     email: emailInput.val().trim(),
@@ -462,10 +612,11 @@
                 // Save to localStorage
                 localStorage.setItem('userData', JSON.stringify(userData));
                 
-                // Choose one submission method based on browser capabilities
+                // Submit form
                 submitForm(userData, 'login');
                 
                 // Update UI
+                communityInput.prop('disabled', true);
                 projectNameInput.prop('disabled', true);
                 fullNameInput.prop('disabled', true);
                 emailInput.prop('disabled', true);
@@ -485,7 +636,10 @@
                 logoutBtn.prop('disabled', true);
                 logoutBtn.text('Getting location...');
                 
+                // Get user data from localStorage
                 const userData = JSON.parse(localStorage.getItem('userData'));
+                
+                // Add logout time and location
                 userData.logoutTime = getGMT8Time();
                 userData.logoutLocation = await getCurrentLocation();
                 
@@ -498,29 +652,151 @@
                 // Submit form data
                 submitForm(userData, 'logout');
                 
-                // Update status message with time elapsed
+                // Update status message
                 statusMessage.html(`Logout successful!<div class="time-elapsed">Time elapsed: ${userData.timeElapsed}</div>`);
                 statusMessage.removeClass('failed').addClass('success').show();
                 
-                // Clear localStorage after a short delay to allow message to be seen
-                setTimeout(function() {
-                    localStorage.removeItem('userData');
-                    
-                    // Reset UI
-                    projectNameInput.prop('disabled', false);
-                    fullNameInput.prop('disabled', false);
-                    emailInput.prop('disabled', false);
-                    loginBtn.prop('disabled', false);
-                    logoutBtn.prop('disabled', true);
-                    logoutBtn.text('Logout');
-                    
-                    isLoggedIn = false;
-                }, 5000);
+                // Show summary modal with all the information
+                showSummary(userData);
                 
-                // Hide message after 8 seconds
+                // Reset logout button
+                logoutBtn.text('Logout');
+            });
+            
+            // Show summary modal with user data
+            function showSummary(userData) {
+                // Clear existing table rows except the header
+                summaryTable.find('tr:gt(0)').remove();
+                
+                // Add data rows to table
+                addSummaryRow('Community', userData.community);
+                addSummaryRow('Project Name', userData.projectName);
+                addSummaryRow('Full Name', userData.fullName);
+                addSummaryRow('Email', userData.email);
+                addSummaryRow('Login Time', userData.loginTime);
+                addSummaryRow('Logout Time', userData.logoutTime);
+                addSummaryRow('Time Elapsed', userData.timeElapsed);
+                addSummaryRow('Login Location', userData.loginLocation);
+                addSummaryRow('Logout Location', userData.logoutLocation);
+                
+                // Show the modal
+                summaryModal.css('display', 'flex');
+            }
+            
+            // Helper function to add a row to the summary table
+            function addSummaryRow(label, value) {
+                summaryTable.append(`
+                    <tr>
+                        <td>${label}</td>
+                        <td>${value}</td>
+                    </tr>
+                `);
+            }
+            
+            // Email the summary
+            emailBtn.on('click', function() {
+                const userData = JSON.parse(localStorage.getItem('userData'));
+                
+                // Format the email body with summary information
+                let emailBody = `
+Community Service Summary
+
+Community: ${userData.community}
+Project Name: ${userData.projectName}
+Full Name: ${userData.fullName}
+Email: ${userData.email}
+Login Time: ${userData.loginTime}
+Logout Time: ${userData.logoutTime}
+Time Elapsed: ${userData.timeElapsed}
+Login Location: ${userData.loginLocation}
+Logout Location: ${userData.logoutLocation}
+                `;
+                
+                // Encode the email body for mailto link
+                emailBody = encodeURIComponent(emailBody);
+                
+                // Create and open mailto link
+                const mailtoLink = `mailto:${userData.email}?subject=Community Service Summary&body=${emailBody}`;
+                window.open(mailtoLink);
+            });
+            
+            // Download summary as an image
+            screenshotBtn.on('click', function() {
+                // Add a loading indicator to the button
+                const originalText = screenshotBtn.text();
+                screenshotBtn.text('Processing...');
+                screenshotBtn.prop('disabled', true);
+                
+                // Use html2canvas to capture the summary content as an image
+                html2canvas(summaryContent[0], {
+                    backgroundColor: '#ffffff',
+                    scale: 2, // Higher scale for better quality
+                    logging: false
+                }).then(canvas => {
+                    try {
+                        // Convert canvas to a data URL
+                        const imageData = canvas.toDataURL('image/png');
+                        
+                        // Create a download link
+                        const downloadLink = document.createElement('a');
+                        downloadLink.href = imageData;
+                        downloadLink.download = 'community-service-summary.png';
+                        
+                        // Trigger the download
+                        document.body.appendChild(downloadLink);
+                        downloadLink.click();
+                        document.body.removeChild(downloadLink);
+                        
+                        // Reset button
+                        screenshotBtn.text(originalText);
+                        screenshotBtn.prop('disabled', false);
+                    } catch (error) {
+                        console.error('Error creating screenshot:', error);
+                        alert('There was an error creating the screenshot. Please try again.');
+                        
+                        // Reset button
+                        screenshotBtn.text(originalText);
+                        screenshotBtn.prop('disabled', false);
+                    }
+                }).catch(error => {
+                    console.error('Error with html2canvas:', error);
+                    alert('There was an error creating the screenshot. Please try again.');
+                    
+                    // Reset button
+                    screenshotBtn.text(originalText);
+                    screenshotBtn.prop('disabled', false);
+                });
+            });
+            
+            // Close the summary modal
+            closeBtn.on('click', function() {
+                // Hide the modal
+                summaryModal.hide();
+                
+                // Reset all inputs and clear localStorage
+                localStorage.removeItem('userData');
+                
+                // Reset UI
+                communityInput.prop('disabled', false).val('');
+                projectNameInput.prop('disabled', false).val('');
+                fullNameInput.prop('disabled', false).val('');
+                emailInput.prop('disabled', false).val('');
+                loginBtn.prop('disabled', false);
+                logoutBtn.prop('disabled', true);
+                
+                isLoggedIn = false;
+                
+                // Hide status message after a delay
                 setTimeout(function() {
                     statusMessage.hide();
-                }, 8000);
+                }, 2000);
+            });
+            
+            // Close modal if clicking outside the content
+            summaryModal.on('click', function(event) {
+                if (event.target === this) {
+                    closeBtn.click();
+                }
             });
             
             // Unified submission function that uses the best available method
@@ -547,8 +823,9 @@
                 xhr.open('POST', formUrl, true);
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 
-                // Prepare form data with project name and separate login/logout times
+                // Prepare form data with community, project name and separate login/logout times
                 let data = [
+                    `${formEntries.community}=${encodeURIComponent(userData.community)}`,
                     `${formEntries.project}=${encodeURIComponent(userData.projectName)}`,
                     `${formEntries.name}=${encodeURIComponent(userData.fullName)}`,
                     `${formEntries.email}=${encodeURIComponent(userData.email)}`,
@@ -579,10 +856,12 @@
                 xhr.send(data);
             }
 
+          
             // Fetch API submission
             function submitWithFetch(userData, action) {
-                // Create form data with project name and separate login/logout times
+                // Create form data with community, project name and separate login/logout times
                 const formData = new FormData();
+                formData.append(formEntries.community, userData.community);
                 formData.append(formEntries.project, userData.projectName);
                 formData.append(formEntries.name, userData.fullName);
                 formData.append(formEntries.email, userData.email);
@@ -614,6 +893,7 @@
                 });
             }
 
+           
             // iframe form submission (fallback method)
             function submitWithIframe(userData, action) {
                 // Create a form element
@@ -622,7 +902,13 @@
                 form.action = formUrl;
                 form.target = 'hiddenFrame';
                 
-                // Create hidden inputs for each field including project name
+                // Create hidden inputs for each field including community and project name
+                const communityInput = document.createElement('input');
+                communityInput.type = 'hidden';
+                communityInput.name = formEntries.community;
+                communityInput.value = userData.community;
+                form.appendChild(communityInput);
+                
                 const projectInput = document.createElement('input');
                 projectInput.type = 'hidden';
                 projectInput.name = formEntries.project;
