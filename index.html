@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Community Monitoring System</title>
+    <title>Community Monitoring System ver 2</title>
     <style>
         * {
             box-sizing: border-box;
@@ -432,6 +432,46 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
+
+//-----
+
+// Add this in your script - more balanced approach
+(function() {
+  // Less aggressive devtools detection
+  let devtoolsOpen = false;
+  
+  // Function to detect devtools via console.log styling
+  const detectDevTools = function() {
+    const threshold = 160;
+    const widthCheck = window.outerWidth - window.innerWidth > threshold;
+    const heightCheck = window.outerHeight - window.innerHeight > threshold;
+    
+    if (!devtoolsOpen && (widthCheck || heightCheck)) {
+      devtoolsOpen = true;
+      // Alert once rather than breaking the page
+      alert("This page doesn't support developer tools.");
+    } else if (devtoolsOpen && !widthCheck && !heightCheck) {
+      devtoolsOpen = false;
+    }
+  };
+  
+  // Check less frequently
+  setInterval(detectDevTools, 3000);
+  
+  // Alternative detection method that doesn't break the page
+  let element = new Image();
+  Object.defineProperty(element, 'id', {
+    get: function() {
+      // Just log to console rather than redirecting
+      console.clear();
+      console.log("Developer tools usage detected");
+    }
+  });
+  
+  console.log('%c', element);
+})();
+//-----
+
 
 
         // Add near the beginning of your script
