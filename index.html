@@ -548,31 +548,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
 
-// ---- DevTools detection (original) ----
-(function() {
-  let devtoolsOpen = false;
-  const detectDevTools = function() {
-    const threshold = 160;
-    const widthCheck = window.outerWidth - window.innerWidth > threshold;
-    const heightCheck = window.outerHeight - window.innerHeight > threshold;
-    if (!devtoolsOpen && (widthCheck || heightCheck)) {
-      devtoolsOpen = true;
-      alert("This page doesn't support developer tools.");
-    } else if (devtoolsOpen && !widthCheck && !heightCheck) {
-      devtoolsOpen = false;
-    }
-  };
-  setInterval(detectDevTools, 3000);
-})();
-
-document.addEventListener('keydown', function(e) {
-  if (e.ctrlKey && e.keyCode == 85) { e.preventDefault(); return false; }
-  if (e.keyCode == 123) { e.preventDefault(); return false; }
-  if (e.ctrlKey && e.shiftKey && e.keyCode == 73) { e.preventDefault(); return false; }
-  if (e.ctrlKey && e.shiftKey && e.keyCode == 74) { e.preventDefault(); return false; }
-  if (e.ctrlKey && e.keyCode == 83) { e.preventDefault(); return false; }
-});
-document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
+// ---- DevTools detection (temporarily disabled for debugging) ----
+// Re-enable after debugging is complete
 
 // ==============================
 // GOOGLE DRIVE UPLOAD via Google Identity Services (OAuth2)
