@@ -128,7 +128,6 @@
             height: 0;
         }
         
-        /* Added attribution style */
         .attribution {
             position: fixed;
             bottom: 10px;
@@ -138,14 +137,12 @@
             z-index: 1000;
         }
         
-        /* Time elapsed styling */
         .time-elapsed {
             margin-top: 10px;
             font-weight: 600;
             color: #444;
         }
         
-        /* Summary modal styling */
         .summary-modal {
             display: none;
             position: fixed;
@@ -204,7 +201,7 @@
             flex: 1;
             max-width: 180px;
         }
-        
+
         #closeBtn {
             background-color: #777;
         }
@@ -221,7 +218,6 @@
             background-color: #e67e22;
         }
         
-        /* Welcome popup styling */
         .popup-overlay {
             position: fixed;
             top: 0;
@@ -292,34 +288,140 @@
         .popup button:disabled {
             background-color: #ccc;
         }
-        
-        /* Responsive adjustments */
+
+        /* ========== FILE UPLOAD SECTION ========== */
+        #uploadSection {
+            display: none;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px dashed #4a90e2;
+        }
+
+        #uploadSection h3 {
+            color: #4a90e2;
+            margin-bottom: 12px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #uploadSection h3::before {
+            content: "📎";
+        }
+
+        .upload-drop-zone {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fafafa;
+            position: relative;
+        }
+
+        .upload-drop-zone:hover, .upload-drop-zone.drag-over {
+            border-color: #4a90e2;
+            background: #eef4fd;
+        }
+
+        .upload-drop-zone p {
+            color: #888;
+            font-size: 14px;
+            margin-top: 6px;
+        }
+
+        .upload-drop-zone .upload-icon {
+            font-size: 32px;
+        }
+
+        #fileInput {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .file-list {
+            margin-top: 12px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: #f0f4f8;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .file-item-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #333;
+        }
+
+        .file-item-status {
+            margin-left: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .file-item-status.pending { color: #888; }
+        .file-item-status.uploading { color: #f39c12; }
+        .file-item-status.done { color: #27ae60; }
+        .file-item-status.error { color: #e74c3c; }
+
+        .remove-file-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0 4px;
+            width: auto;
+            line-height: 1;
+        }
+
+        .remove-file-btn:hover {
+            background: none;
+            color: #c0392b;
+        }
+
+        #uploadBtn {
+            margin-top: 12px;
+            background-color: #27ae60;
+            display: none;
+        }
+
+        #uploadBtn:hover {
+            background-color: #219a52;
+        }
+
+        .upload-status {
+            margin-top: 10px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 13px;
+            display: none;
+        }
+
+        /* ========== RESPONSIVE ========== */
         @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-            
-            .button-group {
-                flex-direction: column;
-            }
-            
-            .summary-content {
-                width: 95%;
-                padding: 20px;
-            }
-            
-            .summary-actions {
-                flex-direction: column;
-            }
-            
-            .summary-actions button {
-                max-width: none;
-            }
-            
-            .popup {
-                width: 95%;
-                padding: 20px;
-            }
+            .container { padding: 20px; }
+            .button-group { flex-direction: column; }
+            .summary-content { width: 95%; padding: 20px; }
+            .summary-actions { flex-direction: column; }
+            .summary-actions button { max-width: none; }
+            .popup { width: 95%; padding: 20px; }
         }
     </style>
 </head>
@@ -327,8 +429,9 @@
     <!-- Welcome Popup -->
     <div class="popup-overlay" id="welcomePopup">
         <div class="popup">
-            <h1>Welcome to CES </h1> <h1>Login-Logout Monitoring System</h1>
-            <p>By accomplishing this form, you fully give consent to the collection and use of data that you will be providing. You are aware that the information shall be collected for the purpose of the community extension report of NU Laguna. the said data will not be used for any other purposes. All of this will be done in accordance with Data Privacy Act of 2012.</p>
+            <h1>Welcome to CES</h1>
+            <h1>Login-Logout Monitoring System</h1>
+            <p>By accomplishing this form, you fully give consent to the collection and use of data that you will be providing. You are aware that the information shall be collected for the purpose of the community extension report of NU Laguna. The said data will not be used for any other purposes. All of this will be done in accordance with Data Privacy Act of 2012.</p>
             <p>Please read the following instructions carefully:</p>
             <ul>
                 <li>This system tracks your community service activities.</li>
@@ -355,9 +458,8 @@
                         <li>Display a summary of your service</li>
                     </ul>
                 </li>
-                <li>Your information will be saved in the browser and submitted to a tracking system.</li>
+                <li>While logged in, you may upload files. They will be saved to Google Drive and renamed automatically.</li>
                 <li>Ensure you have a stable internet connection for accurate tracking.</li>
-
             </ul>
             <div class="checkbox-container">
                 <input type="checkbox" id="understand-checkbox">
@@ -369,18 +471,16 @@
 
     <div class="container">
         <div class="logo-container">
-            <img src="nulogo.png" alt="NU Laguna Logo" class="logo">
+            <img src="nulogo.png" alt="NU Laguna Logo" class="logo" onerror="this.style.display='none'">
         </div>
         <h1>CES Login-Logout System</h1>
         
-        <!-- New Community field -->
         <div class="form-group">
             <label for="community">Partner Community</label>
             <input type="text" id="community" placeholder="Enter partner community">
             <div id="communityError" class="error">Please enter the partner community</div>
         </div>
         
-        <!-- Project Name field -->
         <div class="form-group">
             <label for="projectName">Project Name</label>
             <input type="text" id="projectName" placeholder="Enter project name">
@@ -405,6 +505,24 @@
         </div>
         
         <div id="statusMessage" class="status"></div>
+
+        <!-- ========== FILE UPLOAD SECTION ========== -->
+        <div id="uploadSection">
+            <h3>Upload Files</h3>
+            <p style="font-size:13px;color:#666;margin-bottom:10px;">
+                Files will be saved to Google Drive and renamed as:<br>
+                <strong>FullName_YYYY-MM-DD_001.ext</strong>
+            </p>
+            <div class="upload-drop-zone" id="dropZone">
+                <input type="file" id="fileInput" multiple>
+                <div class="upload-icon">☁️</div>
+                <strong>Click or drag files here</strong>
+                <p>Any file type accepted</p>
+            </div>
+            <div class="file-list" id="fileList"></div>
+            <button id="uploadBtn">Upload to Google Drive</button>
+            <div class="upload-status" id="uploadStatus"></div>
+        </div>
     </div>
     
     <!-- Summary Modal -->
@@ -418,810 +536,571 @@
                 </tr>
             </table>
             <div class="summary-actions">
-                <!-- <button id="emailBtn">Email Summary</button> -->
                 <button id="screenshotBtn">Download Summary</button>
                 <button id="closeBtn">Close</button>
             </div>
         </div>
     </div>
 
-    
-    
-    <iframe id="hiddenFrame" name="hiddenFrame"></iframe>
+    <iframe id="hiddenFrame" name="hiddenFrame" style="display:none;width:0;height:0;"></iframe>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
 
-//-----
+// ---- DevTools detection (temporarily disabled for debugging) ----
+// Re-enable after debugging is complete
 
-// Add this in your script - more balanced approach
-(function() {
-  // Less aggressive devtools detection
-  let devtoolsOpen = false;
-  
-  // Function to detect devtools via console.log styling
-  const detectDevTools = function() {
-    const threshold = 160;
-    const widthCheck = window.outerWidth - window.innerWidth > threshold;
-    const heightCheck = window.outerHeight - window.innerHeight > threshold;
-    
-    if (!devtoolsOpen && (widthCheck || heightCheck)) {
-      devtoolsOpen = true;
-      // Alert once rather than breaking the page
-      alert("This page doesn't support developer tools.");
-    } else if (devtoolsOpen && !widthCheck && !heightCheck) {
-      devtoolsOpen = false;
+// ==============================
+// GOOGLE DRIVE UPLOAD via Google Identity Services (OAuth2)
+// ==============================
+
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyAgcz9XtYjOIkYyMt8rQcNtJOPo8qVMzYok26OchHKV2UiQbwZhlRb4W9JppvesG76jw/exec';
+
+// Upload a single file via Google Apps Script (no OAuth needed for users)
+async function uploadFileToDrive(file, renamedFilename) {
+    const mimeType = file.type || 'application/octet-stream';
+
+    // Convert file to base64
+    const base64Data = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+
+    const payload = {
+        fileName: renamedFilename,
+        fileData: base64Data,
+        mimeType: mimeType
+    };
+
+    const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+        throw new Error(`Upload failed: HTTP ${response.status}`);
     }
-  };
-  
-  // Check less frequently
-  setInterval(detectDevTools, 3000);
-  
-  // Alternative detection method that doesn't break the page
-  let element = new Image();
-  Object.defineProperty(element, 'id', {
-    get: function() {
-      // Just log to console rather than redirecting
-      console.clear();
-      console.log("Developer tools usage detected");
+
+    const result = await response.json();
+    if (!result.success) {
+        throw new Error(result.error || 'Upload failed');
     }
-  });
-  
-  console.log('%c', element);
-})();
-//-----
 
+    return result; // { success, fileId, fileName }
+}
 
+// ---- Helpers ----
+const uploadCounterKey = (fullName, dateStr) => `upload_${fullName}_${dateStr}`;
 
-        // Add near the beginning of your script
-(function() {
-  const scriptStrings = [
-    // Your obfuscated code split into strings
-    "function protectedFunction() { /* your code */ }",
-    // More code strings
-  ];
-  
-  // Dynamically execute the scripts
-  for (let i = 0; i < scriptStrings.length; i++) {
-    setTimeout(function() {
-      (new Function(scriptStrings[i]))();
-    }, 0);
-  }
-})();
+function getTodayStr() {
+    const now  = new Date();
+    const gmt8 = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+    const y = gmt8.getUTCFullYear();
+    const m = String(gmt8.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(gmt8.getUTCDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+}
 
-        // Add this near the top of your script section
-document.addEventListener('keydown', function(e) {
-  // Block Ctrl+U (View Source)
-  if (e.ctrlKey && e.keyCode == 85) {
-    e.preventDefault();
-    return false;
-  }
-  // Block F12 key (Developer Tools)
-  if (e.keyCode == 123) {
-    e.preventDefault();
-    return false;
-  }
-  // Block Ctrl+Shift+I (Developer Tools)
-  if (e.ctrlKey && e.shiftKey && e.keyCode == 73) {
-    e.preventDefault();
-    return false;
-  }
-  // Block Ctrl+Shift+J (Developer Tools)
-  if (e.ctrlKey && e.shiftKey && e.keyCode == 74) {
-    e.preventDefault();
-    return false;
-  }
-  // Block Ctrl+S (Save Page)
-  if (e.ctrlKey && e.keyCode == 83) {
-    e.preventDefault();
-    return false;
-  }
-});
+function getFileExtension(filename) {
+    const parts = filename.split('.');
+    return parts.length > 1 ? parts.pop() : '';
+}
 
-// Disable right-click context menu
-document.addEventListener('contextmenu', function(e) {
-  e.preventDefault();
-  return false;
-});
+function buildRenamedFilename(fullName, dateStr, increment, ext) {
+    const safeName = fullName.trim().replace(/[^a-zA-Z0-9]/g, '_');
+    const num = String(increment).padStart(3, '0');
+    return ext ? `${safeName}_${dateStr}_${num}.${ext}` : `${safeName}_${dateStr}_${num}`;
+}
+
+// ==============================
+// MAIN APP LOGIC
+// ==============================
 $(document).ready(function() {
-    // Welcome popup functionality
+    // Welcome popup
     const welcomePopup = $('#welcomePopup');
     const understandCheckbox = $('#understand-checkbox');
     const continueBtn = $('#continue-btn');
-    
-    // Check if user has already seen the popup
-    if (!localStorage.getItem('popupSeen')) {
-        welcomePopup.show();
-    } else {
-        welcomePopup.hide();
-    }
-    
-    // Replace the above if-else block with this:
-    // Always show the popup when the application starts
     welcomePopup.show();
-    
-    // Enable continue button when checkbox is checked
     understandCheckbox.on('change', function() {
         continueBtn.prop('disabled', !this.checked);
     });
-    
-    // Handle continue button click
     continueBtn.on('click', function() {
-        // Hide popup
         welcomePopup.hide();
-        // Remove or comment out this line to prevent saving to localStorage:
-        // localStorage.setItem('popupSeen', 'true');
     });
-            
-            // Email validation regex
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            
-            // Form elements
-            const communityInput = $('#community');
-            const projectNameInput = $('#projectName');
-            const fullNameInput = $('#fullName');
-            const emailInput = $('#email');
-            const loginBtn = $('#loginBtn');
-            const logoutBtn = $('#logoutBtn');
-            const communityError = $('#communityError');
-            const projectError = $('#projectError');
-            const nameError = $('#nameError');
-            const emailError = $('#emailError');
-            const statusMessage = $('#statusMessage');
-            
-            // Summary modal elements
-            const summaryModal = $('#summaryModal');
-            const summaryTable = $('#summaryTable');
-            const emailBtn = $('#emailBtn');
-            const screenshotBtn = $('#screenshotBtn');
-            const closeBtn = $('#closeBtn');
-            const summaryContent = $('#summaryContent');
-            
-            const formPrefix = 'https://docs.google.com/forms/d/e/';
-            const formIdentifier = '1FAIpQLSe6C0v7Vwd8W1ck6wcKCph2EDxQap11UGzYpmdfJ58oAOSJiQ';
-            const formUrl = `${formPrefix}${formIdentifier}/formResponse`;
-            
-            // Entry IDs for Google Form 
-            const formEntries = {
-                community: 'entry.1870999305', // Community field
-                project: 'entry.925905504',
-                name: 'entry.1849035150',
-                email: 'entry.1359401918',
-                loginTime: 'entry.1585204396',
-                logoutTime: 'entry.910665292',
-                action: 'entry.1204481541',
-                loginLocation: 'entry.1789535182',
-                logoutLocation: 'entry.2125902341',
-                timeElapsed: 'entry.1472467140'  
-            };
-            
-            // Current user state
-            let isLoggedIn = false;
-            
-            // Function to get time in GMT+8 
-            function getGMT8Time() {
-                const now = new Date();
-                
-                // Get GMT+8 time by adding 8 hours of milliseconds to UTC
-                const gmt8Time = new Date(now.getTime() + (8 * 60 * 60 * 1000));
-                
-                // Format as YYYY-MM-DD HH:MM:SS GMT+8
-                const year = gmt8Time.getUTCFullYear();
-                const month = String(gmt8Time.getUTCMonth() + 1).padStart(2, '0');
-                const day = String(gmt8Time.getUTCDate()).padStart(2, '0');
-                const hours = String(gmt8Time.getUTCHours()).padStart(2, '0');
-                const minutes = String(gmt8Time.getUTCMinutes()).padStart(2, '0');
-                const seconds = String(gmt8Time.getUTCSeconds()).padStart(2, '0');
-                
-                return `${year}-${month}-${day} ${hours}:${minutes}:${seconds} GMT+8`;
-            }
-            
-            // Function to get Date object from formatted GMT+8 string
-            function parseGMT8Time(timeString) {
-                // Format: YYYY-MM-DD HH:MM:SS GMT+8
-                const regex = /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2}) GMT\+8/;
-                const match = timeString.match(regex);
-                
-                if (match) {
-                    const year = parseInt(match[1]);
-                    const month = parseInt(match[2]) - 1; 
-                    const day = parseInt(match[3]);
-                    const hours = parseInt(match[4]);
-                    const minutes = parseInt(match[5]);
-                    const seconds = parseInt(match[6]);
-                    
-                    // Create date in UTC then adjust for GMT+8
-                    const date = new Date(Date.UTC(year, month, day, hours, minutes, seconds));
-                    return date;
-                }
-                
-                return null;
-            }
-            
-            // Compute the elapsed time between login and logout
-            function calculateTimeElapsed(loginTime, logoutTime) {
-                const loginDate = parseGMT8Time(loginTime);
-                const logoutDate = parseGMT8Time(logoutTime);
-                
-                if (!loginDate || !logoutDate) {
-                    return "Invalid time format";
-                }
-                
-                // difference in milliseconds
-                const diffMs = logoutDate - loginDate;
-                
-                // Convert to hours and minutes
-                const hours = Math.floor(diffMs / (1000 * 60 * 60));
-                const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-                
-                // Format the result
-                return `${hours} hour(s) and ${minutes} minute(s)`;
-            }
-            
-            // Get current location as a readable address
-            function getCurrentLocation() {
-                return new Promise((resolve, reject) => {
-                    if (!navigator.geolocation) {
-                        resolve("Geolocation not supported");
-                        return;
-                    }
-                    
-                    navigator.geolocation.getCurrentPosition(
-                        position => {
-                            const lat = position.coords.latitude;
-                            const lng = position.coords.longitude;
-                            
-                            // Use reverse geocoding to get a readable address
-                            getAddressFromCoordinates(lat, lng)
-                                .then(address => {
-                                    resolve(address);
-                                })
-                                .catch(error => {
-                                    console.warn('Error getting address:', error);
-                                    resolve(`Near ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
-                                });
-                        },
-                        error => {
-                            console.warn(`ERROR(${error.code}): ${error.message}`);
-                            resolve("Location permission denied");
-                        },
-                        { 
-                            enableHighAccuracy: true,
-                            timeout: 10000,
-                            maximumAge: 0
-                        }
-                    );
-                });
-            }
-            
-            // Function to convert coordinates to address using reverse geocoding
-            function getAddressFromCoordinates(lat, lng) {
-                return new Promise((resolve, reject) => {
-                    // Use OpenStreetMap's Nominatim service for reverse geocoding
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const communityInput = $('#community');
+    const projectNameInput = $('#projectName');
+    const fullNameInput = $('#fullName');
+    const emailInput = $('#email');
+    const loginBtn = $('#loginBtn');
+    const logoutBtn = $('#logoutBtn');
+    const communityError = $('#communityError');
+    const projectError = $('#projectError');
+    const nameError = $('#nameError');
+    const emailError = $('#emailError');
+    const statusMessage = $('#statusMessage');
+    const summaryModal = $('#summaryModal');
+    const summaryTable = $('#summaryTable');
+    const screenshotBtn = $('#screenshotBtn');
+    const closeBtn = $('#closeBtn');
+    const summaryContent = $('#summaryContent');
+
+    // Upload elements
+    const uploadSection = $('#uploadSection');
+    const fileInput = $('#fileInput');
+    const fileListEl = $('#fileList');
+    const uploadBtn = $('#uploadBtn');
+    const uploadStatus = $('#uploadStatus');
+    const dropZone = $('#dropZone');
+
+    const formPrefix = 'https://docs.google.com/forms/d/e/';
+    const formIdentifier = '1FAIpQLSe6C0v7Vwd8W1ck6wcKCph2EDxQap11UGzYpmdfJ58oAOSJiQ';
+    const formUrl = `${formPrefix}${formIdentifier}/formResponse`;
+
+    const formEntries = {
+        community: 'entry.1870999305',
+        project: 'entry.925905504',
+        name: 'entry.1849035150',
+        email: 'entry.1359401918',
+        loginTime: 'entry.1585204396',
+        logoutTime: 'entry.910665292',
+        action: 'entry.1204481541',
+        loginLocation: 'entry.1789535182',
+        logoutLocation: 'entry.2125902341',
+        timeElapsed: 'entry.1472467140'
+    };
+
+    let isLoggedIn = false;
+    let pendingFiles = []; // Array of File objects
+
+    function getGMT8Time() {
+        const now = new Date();
+        const gmt8Time = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+        const year = gmt8Time.getUTCFullYear();
+        const month = String(gmt8Time.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(gmt8Time.getUTCDate()).padStart(2, '0');
+        const hours = String(gmt8Time.getUTCHours()).padStart(2, '0');
+        const minutes = String(gmt8Time.getUTCMinutes()).padStart(2, '0');
+        const seconds = String(gmt8Time.getUTCSeconds()).padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds} GMT+8`;
+    }
+
+    function parseGMT8Time(timeString) {
+        const regex = /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2}) GMT\+8/;
+        const match = timeString.match(regex);
+        if (match) {
+            return new Date(Date.UTC(
+                parseInt(match[1]), parseInt(match[2]) - 1, parseInt(match[3]),
+                parseInt(match[4]), parseInt(match[5]), parseInt(match[6])
+            ));
+        }
+        return null;
+    }
+
+    function calculateTimeElapsed(loginTime, logoutTime) {
+        const loginDate = parseGMT8Time(loginTime);
+        const logoutDate = parseGMT8Time(logoutTime);
+        if (!loginDate || !logoutDate) return "Invalid time format";
+        const diffMs = logoutDate - loginDate;
+        const hours = Math.floor(diffMs / (1000 * 60 * 60));
+        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        return `${hours} hour(s) and ${minutes} minute(s)`;
+    }
+
+    function getCurrentLocation() {
+        return new Promise((resolve) => {
+            if (!navigator.geolocation) { resolve("Geolocation not supported"); return; }
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
                     const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
-                    
-                    fetch(url, {
-                        headers: {
-                            'Accept': 'application/json',
-                            'User-Agent': 'CES Login-Logout System' 
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data && data.display_name) {
-                            // Returns a well-formatted address string
-                            resolve(data.display_name);
-                        } else {
-                            // Fallback to coordinates if address can't be determined
-                            resolve(`Near ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
-                        }
-                    })
-                    .catch(error => {
-                        console.warn('Geocoding failed:', error);
-                        // Fallback to coordinates if geocoding fails
-                        resolve(`Near ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
-                    });
-                });
-            }
-            
-            // Check if user is logged in from localStorage
-            function checkLoginState() {
-                const userData = localStorage.getItem('userData');
-                if (userData) {
-                    const user = JSON.parse(userData);
-                    communityInput.val(user.community);
-                    projectNameInput.val(user.projectName);
-                    fullNameInput.val(user.fullName);
-                    emailInput.val(user.email);
-                    
-                    // Disable inputs and update button states
-                    communityInput.prop('disabled', true);
-                    projectNameInput.prop('disabled', true);
-                    fullNameInput.prop('disabled', true);
-                    emailInput.prop('disabled', true);
-                    loginBtn.prop('disabled', true);
-                    logoutBtn.prop('disabled', false);
-                    
-                    isLoggedIn = true;
-                    
-                    // Show login status
-                    statusMessage.text(`You are logged in as ${user.fullName} on project: ${user.projectName} at ${user.community}`);
-                    statusMessage.removeClass('failed').addClass('success').show();
-                }
-            }
-            
-            // Run on page load
-            checkLoginState();
-            
-            // Validate inputs
-            function validateInputs() {
-                let isValid = true;
-                
-                // Validate community
-                if (communityInput.val().trim() === '') {
-                    communityError.show();
-                    isValid = false;
-                } else {
-                    communityError.hide();
-                }
-                
-                // Validate project name
-                if (projectNameInput.val().trim() === '') {
-                    projectError.show();
-                    isValid = false;
-                } else {
-                    projectError.hide();
-                }
-                
-                // Validate name
-                if (fullNameInput.val().trim() === '') {
-                    nameError.show();
-                    isValid = false;
-                } else {
-                    nameError.hide();
-                }
-                
-                // Validate email
-                if (!emailRegex.test(emailInput.val())) {
-                    emailError.show();
-                    isValid = false;
-                } else {
-                    emailError.hide();
-                }
-                
-                return isValid;
-            }
-            
-            // Real-time validation
-            communityInput.on('input', function() {
-                if (communityInput.val().trim() !== '') {
-                    communityError.hide();
-                }
-            });
-            
-            projectNameInput.on('input', function() {
-                if (projectNameInput.val().trim() !== '') {
-                    projectError.hide();
-                }
-            });
-            
-            fullNameInput.on('input', function() {
-                if (fullNameInput.val().trim() !== '') {
-                    nameError.hide();
-                }
-            });
-            
-            emailInput.on('input', function() {
-                if (emailRegex.test(emailInput.val())) {
-                    emailError.hide();
-                }
-            });
-            
-            // Handle login
-            loginBtn.on('click', async function() {
-                if (!validateInputs()) {
-                    return;
-                }
-                
-                loginBtn.prop('disabled', true);
-                loginBtn.text('Getting location...');
-                
-                const loginTime = getGMT8Time();
-                const loginLocation = await getCurrentLocation();
-                
-                const userData = {
-                    community: communityInput.val().trim(),
-                    projectName: projectNameInput.val().trim(),
-                    fullName: fullNameInput.val().trim(),
-                    email: emailInput.val().trim(),
-                    loginTime: loginTime,
-                    loginLocation: loginLocation,
-                    logoutTime: null,
-                    logoutLocation: null,
-                    timeElapsed: null
-                };
-                
-                // Save to localStorage
-                localStorage.setItem('userData', JSON.stringify(userData));
-                
-                // Submit form
-                submitForm(userData, 'login');
-                
-                // Update UI
-                communityInput.prop('disabled', true);
-                projectNameInput.prop('disabled', true);
-                fullNameInput.prop('disabled', true);
-                emailInput.prop('disabled', true);
-                loginBtn.prop('disabled', true);
-                loginBtn.text('Login');
-                logoutBtn.prop('disabled', false);
-                
-                isLoggedIn = true;
-                
-                // Show success message
-                statusMessage.text('Login successful!');
-                statusMessage.removeClass('failed').addClass('success').show();
-            });
-            
-            // Handle logout
-            logoutBtn.on('click', async function() {
-                logoutBtn.prop('disabled', true);
-                logoutBtn.text('Getting location...');
-                
-                // Get user data from localStorage
-                const userData = JSON.parse(localStorage.getItem('userData'));
-                
-                // Add logout time and location
-                userData.logoutTime = getGMT8Time();
-                userData.logoutLocation = await getCurrentLocation();
-                
-                // Calculate time elapsed
-                userData.timeElapsed = calculateTimeElapsed(userData.loginTime, userData.logoutTime);
-                
-                // Update localStorage
-                localStorage.setItem('userData', JSON.stringify(userData));
-                
-                // Submit form data
-                submitForm(userData, 'logout');
-                
-                // Update status message
-                statusMessage.html(`Logout successful!<div class="time-elapsed">Time elapsed: ${userData.timeElapsed}</div>`);
-                statusMessage.removeClass('failed').addClass('success').show();
-                
-                // Show summary modal with all the information
-                showSummary(userData);
-                
-                // Reset logout button
-                logoutBtn.text('Logout');
-            });
-            
-            // Show summary modal with user data
-            function showSummary(userData) {
-                // Clear existing table rows except the header
-                summaryTable.find('tr:gt(0)').remove();
-                
-                // Add data rows to table
-                addSummaryRow('Community', userData.community);
-                addSummaryRow('Project Name', userData.projectName);
-                addSummaryRow('Full Name', userData.fullName);
-                addSummaryRow('Email', userData.email);
-                addSummaryRow('Login Time', userData.loginTime);
-                addSummaryRow('Logout Time', userData.logoutTime);
-                addSummaryRow('Time Elapsed', userData.timeElapsed);
-                addSummaryRow('Login Location', userData.loginLocation);
-                addSummaryRow('Logout Location', userData.logoutLocation);
-                
-                // Show the modal
-                summaryModal.css('display', 'flex');
-            }
-            
-            // Helper function to add a row to the summary table
-            function addSummaryRow(label, value) {
-                summaryTable.append(`
-                    <tr>
-                        <td>${label}</td>
-                        <td>${value}</td>
-                    </tr>
-                `);
-            }
-            
-            // Email the summary
-            emailBtn.on('click', function() {
-                const userData = JSON.parse(localStorage.getItem('userData'));
-                
-                // Format the email body with summary information
-                let emailBody = `
-Community Service Summary
+                    fetch(url, { headers: { 'Accept': 'application/json', 'User-Agent': 'CES Login-Logout System' } })
+                        .then(r => r.json())
+                        .then(data => resolve(data?.display_name || `Near ${lat.toFixed(6)}, ${lng.toFixed(6)}`))
+                        .catch(() => resolve(`Near ${lat.toFixed(6)}, ${lng.toFixed(6)}`));
+                },
+                () => resolve("Location permission denied"),
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        });
+    }
 
-Community: ${userData.community}
-Project Name: ${userData.projectName}
-Full Name: ${userData.fullName}
-Email: ${userData.email}
-Login Time: ${userData.loginTime}
-Logout Time: ${userData.logoutTime}
-Time Elapsed: ${userData.timeElapsed}
-Login Location: ${userData.loginLocation}
-Logout Location: ${userData.logoutLocation}
-                `;
-                
-                // Encode the email body for mailto link
-                emailBody = encodeURIComponent(emailBody);
-                
-                // Create and open mailto link
-                const mailtoLink = `mailto:${userData.email}?subject=Community Service Summary&body=${emailBody}`;
-                window.open(mailtoLink);
-            });
-            
-            // Download summary as an image
-            screenshotBtn.on('click', function() {
-                // Add a loading indicator to the button
-                const originalText = screenshotBtn.text();
-                screenshotBtn.text('Processing...');
-                screenshotBtn.prop('disabled', true);
-                
-                // Use html2canvas to capture the summary content as an image
-                html2canvas(summaryContent[0], {
-                    backgroundColor: '#ffffff',
-                    scale: 2, // Higher scale for better quality
-                    logging: false
-                }).then(canvas => {
-                    try {
-                        // Convert canvas to a data URL
-                        const imageData = canvas.toDataURL('image/png');
-                        
-                        // Create a download link
-                        const downloadLink = document.createElement('a');
-                        downloadLink.href = imageData;
-                        downloadLink.download = 'community-service-summary.png';
-                        
-                        // Trigger the download
-                        document.body.appendChild(downloadLink);
-                        downloadLink.click();
-                        document.body.removeChild(downloadLink);
-                        
-                        // Reset button
-                        screenshotBtn.text(originalText);
-                        screenshotBtn.prop('disabled', false);
-                    } catch (error) {
-                        console.error('Error creating screenshot:', error);
-                        alert('There was an error creating the screenshot. Please try again.');
-                        
-                        // Reset button
-                        screenshotBtn.text(originalText);
-                        screenshotBtn.prop('disabled', false);
-                    }
-                }).catch(error => {
-                    console.error('Error with html2canvas:', error);
-                    alert('There was an error creating the screenshot. Please try again.');
-                    
-                    // Reset button
-                    screenshotBtn.text(originalText);
-                    screenshotBtn.prop('disabled', false);
-                });
-            });
-            
-            // Close the summary modal
-            closeBtn.on('click', function() {
-                // Hide the modal
-                summaryModal.hide();
-                
-                // Reset all inputs and clear localStorage
-                localStorage.removeItem('userData');
-                
-                // Reset UI
-                communityInput.prop('disabled', false).val('');
-                projectNameInput.prop('disabled', false).val('');
-                fullNameInput.prop('disabled', false).val('');
-                emailInput.prop('disabled', false).val('');
-                loginBtn.prop('disabled', false);
-                logoutBtn.prop('disabled', true);
-                
-                isLoggedIn = false;
-                
-                // Hide status message after a delay
-                setTimeout(function() {
-                    statusMessage.hide();
-                }, 2000);
-            });
-            
-            // Close modal if clicking outside the content
-            summaryModal.on('click', function(event) {
-                if (event.target === this) {
-                    closeBtn.click();
-                }
-            });
-            
-            // Unified submission function that uses the best available method
-            function submitForm(userData, action) {
-                // Try methods in order of preference until one succeeds
-                if (window.fetch) {
-                    // Use Fetch API if available (modern browsers)
-                    submitWithFetch(userData, action);
-                    console.log(`Using Fetch API for ${action} submission`);
-                } else if (window.XMLHttpRequest) {
-                    // Fall back to XMLHttpRequest (older browsers)
-                    submitWithXHR(userData, action);
-                    console.log(`Using XMLHttpRequest for ${action} submission`);
-                } else {
-                    // Last resort: iframe form submission (very old browsers)
-                    submitWithIframe(userData, action);
-                    console.log(`Using iframe for ${action} submission`);
-                }
-            }
-            
-            // XMLHttpRequest submission
-            function submitWithXHR(userData, action) {
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', formUrl, true);
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                
-                // Prepare form data with community, project name and separate login/logout times
-                let data = [
-                    `${formEntries.community}=${encodeURIComponent(userData.community)}`,
-                    `${formEntries.project}=${encodeURIComponent(userData.projectName)}`,
-                    `${formEntries.name}=${encodeURIComponent(userData.fullName)}`,
-                    `${formEntries.email}=${encodeURIComponent(userData.email)}`,
-                    `${formEntries.action}=${encodeURIComponent(action)}`
-                ];
+    function checkLoginState() {
+        const userData = localStorage.getItem('userData');
+        if (userData) {
+            const user = JSON.parse(userData);
+            communityInput.val(user.community);
+            projectNameInput.val(user.projectName);
+            fullNameInput.val(user.fullName);
+            emailInput.val(user.email);
+            communityInput.prop('disabled', true);
+            projectNameInput.prop('disabled', true);
+            fullNameInput.prop('disabled', true);
+            emailInput.prop('disabled', true);
+            loginBtn.prop('disabled', true);
+            logoutBtn.prop('disabled', false);
+            isLoggedIn = true;
+            statusMessage.text(`You are logged in as ${user.fullName} on project: ${user.projectName} at ${user.community}`);
+            statusMessage.removeClass('failed').addClass('success').show();
+            uploadSection.show();
+        }
+    }
 
-                // Add appropriate timestamp and location based on action
-                if (action === 'login') {
-                    data.push(`${formEntries.loginTime}=${encodeURIComponent(userData.loginTime)}`);
-                    data.push(`${formEntries.loginLocation}=${encodeURIComponent(userData.loginLocation)}`);
-                } else if (action === 'logout') {
-                    // Include both times, locations, and time elapsed for logout action
-                    data.push(`${formEntries.loginTime}=${encodeURIComponent(userData.loginTime)}`);
-                    data.push(`${formEntries.logoutTime}=${encodeURIComponent(userData.logoutTime)}`);
-                    data.push(`${formEntries.loginLocation}=${encodeURIComponent(userData.loginLocation)}`);
-                    data.push(`${formEntries.logoutLocation}=${encodeURIComponent(userData.logoutLocation)}`);
-                    data.push(`${formEntries.timeElapsed}=${encodeURIComponent(userData.timeElapsed)}`);
-                }
+    checkLoginState();
 
-                // Join data into query string
-                data = data.join('&');
+    function validateInputs() {
+        let isValid = true;
+        if (communityInput.val().trim() === '') { communityError.show(); isValid = false; } else { communityError.hide(); }
+        if (projectNameInput.val().trim() === '') { projectError.show(); isValid = false; } else { projectError.hide(); }
+        if (fullNameInput.val().trim() === '') { nameError.show(); isValid = false; } else { nameError.hide(); }
+        if (!emailRegex.test(emailInput.val())) { emailError.show(); isValid = false; } else { emailError.hide(); }
+        return isValid;
+    }
 
-                // Set no-cache headers
-                xhr.setRequestHeader('Cache-Control', 'no-cache, no-store, max-age=0');
-                xhr.setRequestHeader('Pragma', 'no-cache');
+    communityInput.on('input', function() { if (communityInput.val().trim() !== '') communityError.hide(); });
+    projectNameInput.on('input', function() { if (projectNameInput.val().trim() !== '') projectError.hide(); });
+    fullNameInput.on('input', function() { if (fullNameInput.val().trim() !== '') nameError.hide(); });
+    emailInput.on('input', function() { if (emailRegex.test(emailInput.val())) emailError.hide(); });
 
-                // Send the request
-                xhr.send(data);
-            }
+    // Login
+    loginBtn.on('click', async function() {
+        if (!validateInputs()) return;
+        loginBtn.prop('disabled', true);
+        loginBtn.text('Getting location...');
+        const loginTime = getGMT8Time();
+        const loginLocation = await getCurrentLocation();
+        const userData = {
+            community: communityInput.val().trim(),
+            projectName: projectNameInput.val().trim(),
+            fullName: fullNameInput.val().trim(),
+            email: emailInput.val().trim(),
+            loginTime,
+            loginLocation,
+            logoutTime: null,
+            logoutLocation: null,
+            timeElapsed: null
+        };
+        localStorage.setItem('userData', JSON.stringify(userData));
+        submitForm(userData, 'login');
+        communityInput.prop('disabled', true);
+        projectNameInput.prop('disabled', true);
+        fullNameInput.prop('disabled', true);
+        emailInput.prop('disabled', true);
+        loginBtn.prop('disabled', true);
+        loginBtn.text('Login');
+        logoutBtn.prop('disabled', false);
+        isLoggedIn = true;
+        statusMessage.text('Login successful!');
+        statusMessage.removeClass('failed').addClass('success').show();
+        uploadSection.show();
+    });
 
-          
-            // Fetch API submission
-            function submitWithFetch(userData, action) {
-                // Create form data with community, project name and separate login/logout times
-                const formData = new FormData();
-                formData.append(formEntries.community, userData.community);
-                formData.append(formEntries.project, userData.projectName);
-                formData.append(formEntries.name, userData.fullName);
-                formData.append(formEntries.email, userData.email);
-                formData.append(formEntries.action, action);
-                
-                // Add appropriate timestamp and location based on action
-                if (action === 'login') {
-                    formData.append(formEntries.loginTime, userData.loginTime);
-                    formData.append(formEntries.loginLocation, userData.loginLocation);
-                } else if (action === 'logout') {
-                    // Include both times, locations, and time elapsed for logout action
-                    formData.append(formEntries.loginTime, userData.loginTime);
-                    formData.append(formEntries.logoutTime, userData.logoutTime);
-                    formData.append(formEntries.loginLocation, userData.loginLocation);
-                    formData.append(formEntries.logoutLocation, userData.logoutLocation);
-                    formData.append(formEntries.timeElapsed, userData.timeElapsed);
-                }
-                
-                // Use fetch with no-cors mode
-                fetch(formUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Cache-Control': 'no-cache, no-store, max-age=0',
-                        'Pragma': 'no-cache'
-                    },
-                    body: new URLSearchParams(formData)
-                });
-            }
+    // Logout
+    logoutBtn.on('click', async function() {
+        logoutBtn.prop('disabled', true);
+        logoutBtn.text('Getting location...');
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        userData.logoutTime = getGMT8Time();
+        userData.logoutLocation = await getCurrentLocation();
+        userData.timeElapsed = calculateTimeElapsed(userData.loginTime, userData.logoutTime);
+        localStorage.setItem('userData', JSON.stringify(userData));
+        submitForm(userData, 'logout');
+        statusMessage.html(`Logout successful!<div class="time-elapsed">Time elapsed: ${userData.timeElapsed}</div>`);
+        statusMessage.removeClass('failed').addClass('success').show();
+        showSummary(userData);
+        logoutBtn.text('Logout');
 
-           
-            // iframe form submission (fallback method)
-            function submitWithIframe(userData, action) {
-                // Create a form element
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = formUrl;
-                form.target = 'hiddenFrame';
-                
-                // Create hidden inputs for each field including community and project name
-                const communityInput = document.createElement('input');
-                communityInput.type = 'hidden';
-                communityInput.name = formEntries.community;
-                communityInput.value = userData.community;
-                form.appendChild(communityInput);
-                
-                const projectInput = document.createElement('input');
-                projectInput.type = 'hidden';
-                projectInput.name = formEntries.project;
-                projectInput.value = userData.projectName;
-                form.appendChild(projectInput);
-                
-                const nameInput = document.createElement('input');
-                nameInput.type = 'hidden';
-                nameInput.name = formEntries.name;
-                nameInput.value = userData.fullName;
-                form.appendChild(nameInput);
-                
-                const emailInput = document.createElement('input');
-                emailInput.type = 'hidden';
-                emailInput.name = formEntries.email;
-                emailInput.value = userData.email;
-                form.appendChild(emailInput);
-                
-                const actionInput = document.createElement('input');
-                actionInput.type = 'hidden';
-                actionInput.name = formEntries.action;
-                actionInput.value = action;
-                form.appendChild(actionInput);
-                
-                // Add appropriate timestamp and location inputs based on action
-                if (action === 'login') {
-                    const loginTimeInput = document.createElement('input');
-                    loginTimeInput.type = 'hidden';
-                    loginTimeInput.name = formEntries.loginTime;
-                    loginTimeInput.value = userData.loginTime;
-                    form.appendChild(loginTimeInput);
-                    
-                    const loginLocationInput = document.createElement('input');
-                    loginLocationInput.type = 'hidden';
-                    loginLocationInput.name = formEntries.loginLocation;
-                    loginLocationInput.value = userData.loginLocation;
-                    form.appendChild(loginLocationInput);
-                } else if (action === 'logout') {
-                    // Include both login and logout times, locations, and time elapsed for logout action
-                    const loginTimeInput = document.createElement('input');
-                    loginTimeInput.type = 'hidden';
-                    loginTimeInput.name = formEntries.loginTime;
-                    loginTimeInput.value = userData.loginTime;
-                    form.appendChild(loginTimeInput);
-                    
-                    const logoutTimeInput = document.createElement('input');
-                    logoutTimeInput.type = 'hidden';
-                    logoutTimeInput.name = formEntries.logoutTime;
-                    logoutTimeInput.value = userData.logoutTime;
-                    form.appendChild(logoutTimeInput);
-                    
-                    const loginLocationInput = document.createElement('input');
-                    loginLocationInput.type = 'hidden';
-                    loginLocationInput.name = formEntries.loginLocation;
-                    loginLocationInput.value = userData.loginLocation;
-                    form.appendChild(loginLocationInput);
-                    
-                    const logoutLocationInput = document.createElement('input');
-                    logoutLocationInput.type = 'hidden';
-                    logoutLocationInput.name = formEntries.logoutLocation;
-                    logoutLocationInput.value = userData.logoutLocation;
-                    form.appendChild(logoutLocationInput);
-                    
-                    const timeElapsedInput = document.createElement('input');
-                    timeElapsedInput.type = 'hidden';
-                    timeElapsedInput.name = formEntries.timeElapsed;
-                    timeElapsedInput.value = userData.timeElapsed;
-                    form.appendChild(timeElapsedInput);
-                }
-                
-                // Append form to body, submit it, then remove it
-                document.body.appendChild(form);
-                form.submit();
-                
-                // Small delay before removing to ensure submission completes
-                setTimeout(() => {
-                    document.body.removeChild(form);
-                }, 1000);
+        // Hide upload section on logout
+        uploadSection.hide();
+        pendingFiles = [];
+        fileListEl.empty();
+        uploadBtn.hide();
+        uploadStatus.hide();
+    });
+
+    // ---- File upload UI logic ----
+
+    // Drag and drop
+    dropZone[0].addEventListener('dragover', function(e) {
+        e.preventDefault();
+        dropZone.addClass('drag-over');
+    });
+    dropZone[0].addEventListener('dragleave', function() {
+        dropZone.removeClass('drag-over');
+    });
+    dropZone[0].addEventListener('drop', function(e) {
+        e.preventDefault();
+        dropZone.removeClass('drag-over');
+        addFiles(Array.from(e.dataTransfer.files));
+    });
+
+    fileInput.on('change', function() {
+        addFiles(Array.from(this.files));
+        this.value = ''; // reset so same file can be re-added if removed
+    });
+
+    function addFiles(files) {
+        files.forEach(file => {
+            // Prevent duplicates by name+size
+            const exists = pendingFiles.some(f => f.name === file.name && f.size === file.size);
+            if (!exists) {
+                pendingFiles.push(file);
+                renderFileItem(file);
             }
         });
+        if (pendingFiles.length > 0) uploadBtn.show();
+    }
+
+    function renderFileItem(file) {
+        const safeId = 'file_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+        file._uiId = safeId;
+        const item = $(`
+            <div class="file-item" id="${safeId}">
+                <span class="file-item-name" title="${file.name}">📄 ${file.name}</span>
+                <span class="file-item-status pending" data-status="${safeId}">Pending</span>
+                <button class="remove-file-btn" title="Remove">✕</button>
+            </div>
+        `);
+        item.find('.remove-file-btn').on('click', function() {
+            pendingFiles = pendingFiles.filter(f => f._uiId !== safeId);
+            item.remove();
+            if (pendingFiles.length === 0) uploadBtn.hide();
+        });
+        fileListEl.append(item);
+    }
+
+    function setFileStatus(uiId, status, text) {
+        const el = $(`[data-status="${uiId}"]`);
+        el.removeClass('pending uploading done error').addClass(status).text(text);
+        // Remove the × button when uploading/done
+        if (status === 'uploading' || status === 'done') {
+            $(`#${uiId}`).find('.remove-file-btn').prop('disabled', true).css('opacity', '0.3');
+        }
+    }
+
+    uploadBtn.on('click', async function() {
+        if (pendingFiles.length === 0) return;
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        if (!userData) {
+            uploadStatus.text('You must be logged in to upload files.').removeClass('success').addClass('failed').show();
+            return;
+        }
+
+        uploadBtn.prop('disabled', true).text('Uploading...');
+        uploadStatus.hide();
+
+        const fullName = userData.fullName;
+        const dateStr = getTodayStr();
+        const counterKey = uploadCounterKey(fullName, dateStr);
+
+        // Get current counter from localStorage (persists across page loads within same day)
+        let counter = parseInt(localStorage.getItem(counterKey) || '0', 10);
+
+        let successCount = 0;
+        let errorCount = 0;
+
+        for (const file of pendingFiles) {
+            const uiId = file._uiId;
+            counter++;
+            const ext = getFileExtension(file.name);
+            const renamedFilename = buildRenamedFilename(fullName, dateStr, counter, ext);
+
+            setFileStatus(uiId, 'uploading', `Uploading → ${renamedFilename}`);
+
+            try {
+                const result = await uploadFileToDrive(file, renamedFilename);
+                setFileStatus(uiId, 'done', `✓ ${renamedFilename}`);
+                // Persist updated counter
+                localStorage.setItem(counterKey, String(counter));
+                successCount++;
+            } catch (err) {
+                counter--; // Don't increment on failure
+                setFileStatus(uiId, 'error', `✗ Failed: ${err.message}`);
+                errorCount++;
+                console.error('Upload error:', err);
+            }
+        }
+
+        // Remove successfully uploaded files from pendingFiles
+        pendingFiles = pendingFiles.filter(f => {
+            const statusEl = $(`[data-status="${f._uiId}"]`);
+            return !statusEl.hasClass('done');
+        });
+
+        uploadBtn.prop('disabled', false).text('Upload to Google Drive');
+        if (pendingFiles.length === 0) uploadBtn.hide();
+
+        let msg = '';
+        if (successCount > 0) msg += `${successCount} file(s) uploaded successfully to "CES Uploads" in Google Drive. `;
+        if (errorCount > 0) msg += `${errorCount} file(s) failed.`;
+
+        uploadStatus
+            .text(msg.trim())
+            .removeClass('success failed')
+            .addClass(errorCount > 0 && successCount === 0 ? 'failed' : 'success')
+            .css({ display: 'block', padding: '8px 12px', borderRadius: '5px',
+                   background: errorCount > 0 && successCount === 0 ? '#f2dede' : '#dff0d8',
+                   color: errorCount > 0 && successCount === 0 ? '#a94442' : '#3c763d' });
+    });
+
+    // ---- Summary modal ----
+    function showSummary(userData) {
+        summaryTable.find('tr:gt(0)').remove();
+        addSummaryRow('Community', userData.community);
+        addSummaryRow('Project Name', userData.projectName);
+        addSummaryRow('Full Name', userData.fullName);
+        addSummaryRow('Email', userData.email);
+        addSummaryRow('Login Time', userData.loginTime);
+        addSummaryRow('Logout Time', userData.logoutTime);
+        addSummaryRow('Time Elapsed', userData.timeElapsed);
+        addSummaryRow('Login Location', userData.loginLocation);
+        addSummaryRow('Logout Location', userData.logoutLocation);
+        summaryModal.css('display', 'flex');
+    }
+
+    function addSummaryRow(label, value) {
+        summaryTable.append(`<tr><td>${label}</td><td>${value}</td></tr>`);
+    }
+
+    screenshotBtn.on('click', function() {
+        const originalText = screenshotBtn.text();
+        screenshotBtn.text('Processing...').prop('disabled', true);
+        html2canvas(summaryContent[0], { backgroundColor: '#ffffff', scale: 2, logging: false })
+            .then(canvas => {
+                const imageData = canvas.toDataURL('image/png');
+                const downloadLink = document.createElement('a');
+                downloadLink.href = imageData;
+                downloadLink.download = 'community-service-summary.png';
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                screenshotBtn.text(originalText).prop('disabled', false);
+            }).catch(() => {
+                alert('There was an error creating the screenshot. Please try again.');
+                screenshotBtn.text(originalText).prop('disabled', false);
+            });
+    });
+
+    closeBtn.on('click', function() {
+        summaryModal.hide();
+        localStorage.removeItem('userData');
+        communityInput.prop('disabled', false).val('');
+        projectNameInput.prop('disabled', false).val('');
+        fullNameInput.prop('disabled', false).val('');
+        emailInput.prop('disabled', false).val('');
+        loginBtn.prop('disabled', false);
+        logoutBtn.prop('disabled', true);
+        isLoggedIn = false;
+        statusMessage.hide();
+        uploadSection.hide();
+        pendingFiles = [];
+        fileListEl.empty();
+        uploadBtn.hide();
+        uploadStatus.hide();
+    });
+
+    summaryModal.on('click', function(event) {
+        if (event.target === this) closeBtn.click();
+    });
+
+    // ---- Form submission methods (original) ----
+    function submitForm(userData, action) {
+        if (window.fetch) { submitWithFetch(userData, action); }
+        else if (window.XMLHttpRequest) { submitWithXHR(userData, action); }
+        else { submitWithIframe(userData, action); }
+    }
+
+    function submitWithXHR(userData, action) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', formUrl, true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        let data = [
+            `${formEntries.community}=${encodeURIComponent(userData.community)}`,
+            `${formEntries.project}=${encodeURIComponent(userData.projectName)}`,
+            `${formEntries.name}=${encodeURIComponent(userData.fullName)}`,
+            `${formEntries.email}=${encodeURIComponent(userData.email)}`,
+            `${formEntries.action}=${encodeURIComponent(action)}`
+        ];
+        if (action === 'login') {
+            data.push(`${formEntries.loginTime}=${encodeURIComponent(userData.loginTime)}`);
+            data.push(`${formEntries.loginLocation}=${encodeURIComponent(userData.loginLocation)}`);
+        } else if (action === 'logout') {
+            data.push(`${formEntries.loginTime}=${encodeURIComponent(userData.loginTime)}`);
+            data.push(`${formEntries.logoutTime}=${encodeURIComponent(userData.logoutTime)}`);
+            data.push(`${formEntries.loginLocation}=${encodeURIComponent(userData.loginLocation)}`);
+            data.push(`${formEntries.logoutLocation}=${encodeURIComponent(userData.logoutLocation)}`);
+            data.push(`${formEntries.timeElapsed}=${encodeURIComponent(userData.timeElapsed)}`);
+        }
+        xhr.setRequestHeader('Cache-Control', 'no-cache, no-store, max-age=0');
+        xhr.setRequestHeader('Pragma', 'no-cache');
+        xhr.send(data.join('&'));
+    }
+
+    function submitWithFetch(userData, action) {
+        const formData = new FormData();
+        formData.append(formEntries.community, userData.community);
+        formData.append(formEntries.project, userData.projectName);
+        formData.append(formEntries.name, userData.fullName);
+        formData.append(formEntries.email, userData.email);
+        formData.append(formEntries.action, action);
+        if (action === 'login') {
+            formData.append(formEntries.loginTime, userData.loginTime);
+            formData.append(formEntries.loginLocation, userData.loginLocation);
+        } else if (action === 'logout') {
+            formData.append(formEntries.loginTime, userData.loginTime);
+            formData.append(formEntries.logoutTime, userData.logoutTime);
+            formData.append(formEntries.loginLocation, userData.loginLocation);
+            formData.append(formEntries.logoutLocation, userData.logoutLocation);
+            formData.append(formEntries.timeElapsed, userData.timeElapsed);
+        }
+        fetch(formUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Cache-Control': 'no-cache, no-store, max-age=0', 'Pragma': 'no-cache' },
+            body: new URLSearchParams(formData)
+        });
+    }
+
+    function submitWithIframe(userData, action) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = formUrl;
+        form.target = 'hiddenFrame';
+        const fields = {
+            [formEntries.community]: userData.community,
+            [formEntries.project]: userData.projectName,
+            [formEntries.name]: userData.fullName,
+            [formEntries.email]: userData.email,
+            [formEntries.action]: action
+        };
+        if (action === 'login') {
+            fields[formEntries.loginTime] = userData.loginTime;
+            fields[formEntries.loginLocation] = userData.loginLocation;
+        } else if (action === 'logout') {
+            fields[formEntries.loginTime] = userData.loginTime;
+            fields[formEntries.logoutTime] = userData.logoutTime;
+            fields[formEntries.loginLocation] = userData.loginLocation;
+            fields[formEntries.logoutLocation] = userData.logoutLocation;
+            fields[formEntries.timeElapsed] = userData.timeElapsed;
+        }
+        Object.entries(fields).forEach(([name, value]) => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = value;
+            form.appendChild(input);
+        });
+        document.body.appendChild(form);
+        form.submit();
+        setTimeout(() => document.body.removeChild(form), 1000);
+    }
+});
     </script>
 </body>
 </html>
