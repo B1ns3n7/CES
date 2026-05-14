@@ -1,0 +1,10 @@
+tnecniv --> CES
+
+client id
+507071031732-bbaoftnce1vs2fmvtrm9se43fprgmj5s.apps.googleusercontent.com
+
+client secret
+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
+
+Web app
+https://script.google.com/macros/s/AKfycbwzxQlYYmJ62k9OnVjftpXiiBtCZoz315DS4oluyHKY5j5f29-5jZHIi4lyGBZzKChzHw/exec
